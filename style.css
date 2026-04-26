@@ -3957,8 +3957,8 @@ body.hushstyle {
 }
 
 #send_form #leftSendForm > div:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
-#send_form #rightSendForm > div:not(.stscript_btn):not(.mes_stop):not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
-#send_form:not(.sb-generating-controls) #send_but:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
+#send_form #rightSendForm > div:not(#send_but):not(#mes_continue):not(#mes_impersonate):not(.stscript_btn):not(.mes_stop):not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
+#send_form:not(.sb-generating-controls) #rightSendForm > #send_but:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
 #send_form.sb-generating-controls .mes_stop,
 #send_form #options_button {
     align-items: center !important;
@@ -3989,6 +3989,23 @@ body.hushstyle {
 
 #send_form.sb-generating-controls :is(#send_but, #mes_continue, #mes_impersonate) {
     display: none !important;
+}
+
+#send_form.sb-generating-controls #rightSendForm > #send_but,
+#send_form.sb-generating-controls #rightSendForm > #mes_continue,
+#send_form.sb-generating-controls #rightSendForm > #mes_impersonate {
+    display: none !important;
+    flex: 0 0 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    max-height: 0 !important;
+    max-width: 0 !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+    width: 0 !important;
 }
 
 #send_form.sb-generating-controls .mes_stop {
