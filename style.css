@@ -3893,13 +3893,14 @@ body.hushstyle {
     );
     --sb-chatbar-surface-bg: color-mix(in srgb, var(--SmartThemeBlurTintColor) 94%, transparent);
     --sb-mobile-overlay-bg: color-mix(in srgb, var(--SmartThemeBlurTintColor) 96%, transparent);
-    --moonlit-sb-composer-button-radius: var(--sb-radius-button, 10px);
+    --moonlit-sb-avatar-column-width: max(var(--custom-ChatAvatar, 40px), 56px);
+    --moonlit-sb-composer-button-radius: var(--sb-icon-control-radius, 10px);
     --moonlit-sb-composer-button-size: var(--bottomFormBlockSize, 42px);
     --moonlit-sb-composer-icon-size: calc(var(--bottomFormIconSize, 24px) * 0.72);
     --moonlit-sb-ripple-avatar-mobile-height: calc(var(--moonlit-sb-ripple-avatar-mobile-width) * var(--customRippleAvatarRatio, 1.5));
     --moonlit-sb-ripple-avatar-mobile-width: var(--customRippleAvatarMobileWidth, 100px);
     --moonlit-sb-swipe-control-size: 24px;
-    --moonlit-sb-swipe-counter-width: 44px;
+    --moonlit-sb-swipe-counter-width: 38px;
     --moonlit-sb-swipe-edge-offset: 8px;
     --moonlit-sb-swipe-gap: 4px;
 }
@@ -3940,22 +3941,22 @@ body.hushstyle {
     text-shadow: none !important;
 }
 
-body:has(#sb-chatbar) #send_form {
+#send_form {
     margin-bottom: var(--sb-chat-composer-gap, 5px) !important;
 }
 
-body:has(#sb-chatbar) #nonQRFormItems {
+#send_form #nonQRFormItems {
     align-items: center !important;
 }
 
-body:has(#sb-chatbar) #leftSendForm,
-body:has(#sb-chatbar) #rightSendForm {
+#send_form #leftSendForm,
+#send_form #rightSendForm {
     align-items: center !important;
     gap: 6px;
     min-width: 0;
 }
 
-body:has(#sb-chatbar) :is(
+#send_form :is(
     #leftSendForm > div:not(.displayNone):not([style*="display: none"]):not([style*="display:none"]),
     #rightSendForm > div:not(.mes_stop):not(.displayNone):not([style*="display: none"]):not([style*="display:none"]),
     #send_but:not(.displayNone):not([style*="display: none"]):not([style*="display:none"]),
@@ -3984,17 +3985,17 @@ body:has(#sb-chatbar) :is(
     width: var(--moonlit-sb-composer-button-size) !important;
 }
 
-body:has(#sb-chatbar) #send_form:not(.sb-generating-controls) .mes_stop {
+#send_form:not(.sb-generating-controls) .mes_stop {
     display: none !important;
 }
 
-body:has(#sb-chatbar) :is(
+#send_form :is(
     #leftSendForm > div,
     #rightSendForm > div,
     #send_form .mes_stop,
     #options_button
 ) > :is(i, svg),
-body:has(#sb-chatbar) :is(#send_but, #options_button)::before {
+#send_form :is(#send_but, #options_button)::before {
     align-items: center !important;
     display: inline-flex !important;
     height: 1em !important;
@@ -4004,7 +4005,7 @@ body:has(#sb-chatbar) :is(#send_but, #options_button)::before {
     width: 1em !important;
 }
 
-body:has(#sb-chatbar) :is(
+#send_form :is(
     #leftSendForm > div,
     #rightSendForm > div:not(.mes_stop),
     #send_but,
@@ -4016,7 +4017,7 @@ body:has(#sb-chatbar) :is(
     opacity: 1 !important;
 }
 
-body:has(#sb-chatbar) :is(
+#send_form :is(
     #leftSendForm > div,
     #rightSendForm > div:not(.mes_stop),
     #send_but,
@@ -4141,6 +4142,70 @@ input[type="number"].moonlit-neo-range-input,
         white-space: normal;
     }
 
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) {
+        align-items: start;
+        column-gap: 10px;
+        display: grid !important;
+        grid-template-columns: minmax(0, var(--moonlit-sb-avatar-column-width)) minmax(0, 1fr) !important;
+        row-gap: 0;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) .mesAvatarWrapper {
+        align-self: start !important;
+        display: flex !important;
+        flex-direction: column !important;
+        grid-column: 1;
+        grid-row: 1;
+        justify-content: flex-start;
+        margin: 0 !important;
+        max-width: var(--moonlit-sb-avatar-column-width);
+        padding: 0 !important;
+        width: var(--moonlit-sb-avatar-column-width);
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) .mesAvatarWrapper .avatar {
+        margin: 0 !important;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) .mes_block {
+        clear: none !important;
+        float: none !important;
+        grid-column: 2;
+        grid-row: 1;
+        max-width: 100% !important;
+        min-width: 0;
+        overflow: visible;
+        width: 100% !important;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) .ch_name {
+        clear: none !important;
+        float: none !important;
+        margin: 0 0 6px 0 !important;
+        max-width: 100% !important;
+        width: auto !important;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) .ch_name .flex-container {
+        margin: 0 !important;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) .mes_text {
+        clear: none !important;
+        float: none !important;
+        left: auto !important;
+        margin-top: 0 !important;
+        max-width: 100% !important;
+        min-height: 0 !important;
+        right: auto !important;
+        width: 100% !important;
+    }
+
+    body.tidestyle #chat .mes:not(.smallSysMes) .mes_text {
+        align-items: stretch;
+        display: block;
+    }
+
     body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipeRightBlock {
         align-items: center;
         bottom: var(--moonlit-sb-swipe-edge-offset) !important;
@@ -4192,21 +4257,24 @@ input[type="number"].moonlit-neo-range-input,
         display: grid !important;
         grid-template-columns: minmax(0, var(--moonlit-sb-ripple-avatar-mobile-width)) minmax(0, 1fr) !important;
         gap: 0;
-        overflow: hidden;
+        overflow: visible;
     }
 
     body.ripplestyle #chat .mes:not(.smallSysMes) .mesAvatarWrapper {
         align-content: start;
         align-self: start !important;
         box-sizing: border-box;
+        display: flex !important;
+        flex-direction: column !important;
         grid-column: 1;
         grid-row: 1;
         height: auto !important;
+        justify-content: flex-start;
         margin: 0 !important;
         max-width: var(--moonlit-sb-ripple-avatar-mobile-width) !important;
         min-height: 0 !important;
         min-width: 0 !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         padding: 0 !important;
         position: relative !important;
         top: auto !important;
@@ -4240,7 +4308,25 @@ input[type="number"].moonlit-neo-range-input,
     body.ripplestyle #chat .mes:not(.smallSysMes) .mes_block {
         grid-column: 2;
         grid-row: 1;
+        margin: 0 !important;
         min-width: 0;
-        padding: 12px 10px 10px !important;
+        padding: 10px 10px 34px 12px !important;
+        width: 100% !important;
+    }
+
+    body.ripplestyle #chat .mes:not(.smallSysMes) .ch_name {
+        margin: 0 0 8px 0 !important;
+        min-height: 0;
+    }
+
+    body.ripplestyle #chat .mes:not(.smallSysMes) .mes_block .ch_name::after {
+        display: block;
+        margin-bottom: 8px;
+        padding-bottom: 0;
+    }
+
+    body.ripplestyle #chat .mes:not(.smallSysMes) .mes_text {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
     }
 }
