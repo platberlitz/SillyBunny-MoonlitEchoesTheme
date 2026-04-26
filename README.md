@@ -1,14 +1,22 @@
-# Moonlit Echoes Theme
+# Moonlit Echoes Theme for SillyBunny
 
 **English** | [繁體中文](https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme/blob/main/.github/README-zh_Hant.md)
 
-This fork targets SillyBunny compatibility. It keeps Moonlit Echoes isolated as a third-party extension and carries its own chat style state, mobile layout guardrails, and SillyBunny shell compatibility CSS without requiring SillyBunny core changes.
+> [!IMPORTANT]
+> This repository is a **SillyBunny-specific fork** of [RivelleDays/SillyTavern-MoonlitEchoesTheme](https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme).
+> Install this fork only if you are using **SillyBunny**.
+> For vanilla SillyTavern, use the upstream Moonlit Echoes repository instead.
+>
+> Fork issues, SillyBunny layout bugs, and compatibility reports should be directed to **purachina** on GitHub through this repository:
+> <https://github.com/platberlitz/SillyBunny-MoonlitEchoesTheme/issues>
+
+This fork keeps Moonlit Echoes isolated as a third-party SillyBunny extension and carries its own chat style state, mobile layout guardrails, and SillyBunny shell compatibility CSS without requiring SillyBunny core changes.
 
 SillyBunny note: Moonlit's Echo, Whisper, Hush, Ripple, and Tide message styles are managed by this extension rather than SillyBunny core. If you import the included UI theme files, their core `chat_display` value stays on Flat for SillyBunny compatibility; choose Moonlit styles from Appearance or the Moonlit slash commands.
 
 ![](https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme/blob/main/.github/ImagePreview/visual_novel_mode.png)
 
-**Moonlit Echoes 月下回聲** is a UI theme designed for SillyTavern. It has been customized and refined based on my personal preferences to create a more modern, elegant, and minimalist interface while enhancing the user experience across both desktop and mobile platforms.
+**Moonlit Echoes 月下回聲** is a UI theme originally designed for SillyTavern. This repository adapts it for **SillyBunny** while preserving the upstream theme's modern, elegant, minimalist interface and desktop/mobile experience.
 
 Moonlit Echoes was first released on the SillyTavern Discord server on November 25, 2024, and has been continuously updated with valuable feedback and support from the community. Eventually, to improve maintainability and ease of updates—and to satisfy my obsession with well-designed themes—I developed this as a SillyTavern extension and made it open-source on GitHub.
 
@@ -41,17 +49,20 @@ The following screenshots are from **version 2.5.0**, taken on a MacBook using C
 
 # Installation
 ## Prerequisites
-It is recommended to use the **latest version** of SillyTavern (either Release or Staging) along with Google Chrome.
+Use the **latest version of SillyBunny** along with Google Chrome.
+
+If you are not using SillyBunny, install the upstream SillyTavern version instead:
+<https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme>
 
 ## Installation Steps
 
-### 1. **Install Moonlit Echoes Theme**
-In the **SillyTavern Extension Manager**, use "Install from URL" and paste the following Git URL:
+### 1. **Install the SillyBunny fork of Moonlit Echoes Theme**
+In the **SillyBunny Extension Manager**, use "Install from URL" and paste the following Git URL:
    ```
    https://github.com/platberlitz/SillyBunny-MoonlitEchoesTheme
    ```
 
-### 2. **Update to `/SillyTavern/config.yaml` for thumbnail settings**
+### 2. **Update `/SillyBunny/config.yaml` for thumbnail settings**
 Previously, I recommended disabling thumbnails, but this can slow down image loading on mobile. Here’s a tested configuration I now recommend:
 ```
 thumbnails:
@@ -66,7 +77,7 @@ thumbnails:
       - 864
       - 1280
 ```
-Before applying and restarting SillyTavern, consider deleting the entire thumbnails folder (likely located at `/SillyTavern/data/default-user/thumbnails`) Don’t worry—it will regenerate automatically with better image quality after restart.
+Before applying and restarting SillyBunny, consider deleting the entire thumbnails folder (likely located at `/SillyBunny/data/default-user/thumbnails`) Don’t worry—it will regenerate automatically with better image quality after restart.
 
 ### 3. **Download and Enable the Theme (Highly Recommended!)**
 
@@ -80,8 +91,10 @@ You can find it in the GitHub theme folder or download it directly below:
 
 No need to tweak anything—just drop the file in and you’re good to go!
 
-## For SillyTavern Users via Termux 📱
-If you’re using SillyTavern via Termux, here’s how you can modify `config.yaml`.
+## Upstream SillyTavern / Termux Note 📱
+This fork is maintained for SillyBunny. If you are using vanilla SillyTavern via Termux, install the upstream Moonlit Echoes repository instead.
+
+If you still need the original Termux guidance, here’s how upstream SillyTavern users can modify `config.yaml`.
 
 > [!Warning]
 > I don’t have experience with Android devices or Termux, so I can’t answer related questions, test the steps, or guarantee results. The following methods are provided by other users.
@@ -134,7 +147,10 @@ Moonlit Echoes is a third-party theme extension and is not affiliated with the o
 **A:** Yes, this is a known issue I haven’t been able to resolve yet. On mobile, the switch may freeze briefly for a few seconds before completing. Just wait a moment and it should load fine. This rarely happens on desktop.
 
 # Feedback & Suggestions
-If you encounter any issues or have feature requests, please submit them in the Issues section using the provided template.
+For this SillyBunny fork, submit issues and feature requests here:
+<https://github.com/platberlitz/SillyBunny-MoonlitEchoesTheme/issues>
+
+Please direct vanilla SillyTavern/upstream Moonlit Echoes issues to the original project instead.
 
 You’re also welcome to share your color schemes in the Discussions section!<br>
 Whether it’s a SillyTavern UI theme or a Moonlit Echoes theme preset, I’d love to see your creative designs.
