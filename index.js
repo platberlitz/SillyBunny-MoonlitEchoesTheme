@@ -129,9 +129,19 @@ function addExtensionMenuButton() {
         return;
     }
 
+    // SillyBunny can re-run extension UI setup when shell surfaces refresh.
+    // Remove any previous Moonlit entry before adding the current one.
+    $extensions_menu
+        .children('[data-moonlit-extension-menu-button="true"], .moonlit-echoes-menu-button')
+        .remove();
+    $extensions_menu
+        .children()
+        .filter((_, element) => element.title === 'Open Moonlit Echoes Theme Settings' && element.textContent.trim() === 'Moonlit Echoes')
+        .remove();
+
     // Create button element with moon icon and theme name
     let $button = $(`
-    <div class="list-group-item flex-container flexGap5 interactable" title="Open Moonlit Echoes Theme Settings" data-i18n="[title]Open Moonlit Echoes Theme Settings" tabindex="0">
+    <div class="list-group-item flex-container flexGap5 interactable moonlit-echoes-menu-button" data-moonlit-extension-menu-button="true" title="Open Moonlit Echoes Theme Settings" data-i18n="[title]Open Moonlit Echoes Theme Settings" tabindex="0">
         <i class="fa-solid fa-moon"></i>
         <span>Moonlit Echoes</span>
     </div>
