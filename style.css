@@ -3956,13 +3956,11 @@ body.hushstyle {
     min-width: 0;
 }
 
-#send_form :is(
-    #leftSendForm > div:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
-    #rightSendForm > div:not(.stscript_btn):not(.mes_stop):not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
-    #send_but:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
-    #send_form.sb-generating-controls .mes_stop,
-    #options_button
-) {
+#send_form #leftSendForm > div:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
+#send_form #rightSendForm > div:not(.stscript_btn):not(.mes_stop):not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
+#send_form:not(.sb-generating-controls) #send_but:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
+#send_form.sb-generating-controls .mes_stop,
+#send_form #options_button {
     align-items: center !important;
     aspect-ratio: 1 / 1;
     border-radius: var(--moonlit-sb-composer-button-radius) !important;
@@ -3989,6 +3987,14 @@ body.hushstyle {
     display: none !important;
 }
 
+#send_form.sb-generating-controls :is(#send_but, #mes_continue, #mes_impersonate) {
+    display: none !important;
+}
+
+#send_form.sb-generating-controls .mes_stop {
+    display: inline-flex !important;
+}
+
 #send_form :is(
     #leftSendForm > div,
     #rightSendForm > div:not(.stscript_btn),
@@ -4008,10 +4014,10 @@ body.hushstyle {
 #send_form :is(
     #leftSendForm > div,
     #rightSendForm > div:not(.stscript_btn):not(.mes_stop),
-    #send_but,
-    #send_form .mes_stop,
     #options_button
-):is(:hover, :focus-visible) {
+):is(:hover, :focus-visible),
+#send_form:not(.sb-generating-controls) #send_but:is(:hover, :focus-visible),
+#send_form.sb-generating-controls .mes_stop:is(:hover, :focus-visible) {
     background: var(--sb-button-hover, color-mix(in srgb, var(--SmartThemeQuoteColor) 14%, transparent)) !important;
     filter: none !important;
     opacity: 1 !important;
@@ -4020,10 +4026,10 @@ body.hushstyle {
 #send_form :is(
     #leftSendForm > div,
     #rightSendForm > div:not(.stscript_btn):not(.mes_stop),
-    #send_but,
-    #send_form .mes_stop,
     #options_button
-):focus-visible {
+):focus-visible,
+#send_form:not(.sb-generating-controls) #send_but:focus-visible,
+#send_form.sb-generating-controls .mes_stop:focus-visible {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-focus-ring, var(--customThemeColor)) 24%, transparent) !important;
     outline: 1px solid color-mix(in srgb, var(--sb-focus-ring, var(--customThemeColor)) 70%, transparent) !important;
     outline-offset: 2px;
