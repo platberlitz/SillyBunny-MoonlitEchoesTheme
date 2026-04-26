@@ -3957,9 +3957,9 @@ body.hushstyle {
 }
 
 #send_form :is(
-    #leftSendForm > div:not(.displayNone):not([style*="display: none"]):not([style*="display:none"]),
-    #rightSendForm > div:not(.mes_stop):not(.displayNone):not([style*="display: none"]):not([style*="display:none"]),
-    #send_but:not(.displayNone):not([style*="display: none"]):not([style*="display:none"]),
+    #leftSendForm > div:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
+    #rightSendForm > div:not(.stscript_btn):not(.mes_stop):not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
+    #send_but:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
     #send_form.sb-generating-controls .mes_stop,
     #options_button
 ) {
@@ -3991,7 +3991,7 @@ body.hushstyle {
 
 #send_form :is(
     #leftSendForm > div,
-    #rightSendForm > div,
+    #rightSendForm > div:not(.stscript_btn),
     #send_form .mes_stop,
     #options_button
 ) > :is(i, svg),
@@ -4007,7 +4007,7 @@ body.hushstyle {
 
 #send_form :is(
     #leftSendForm > div,
-    #rightSendForm > div:not(.mes_stop),
+    #rightSendForm > div:not(.stscript_btn):not(.mes_stop),
     #send_but,
     #send_form .mes_stop,
     #options_button
@@ -4019,7 +4019,7 @@ body.hushstyle {
 
 #send_form :is(
     #leftSendForm > div,
-    #rightSendForm > div:not(.mes_stop),
+    #rightSendForm > div:not(.stscript_btn):not(.mes_stop),
     #send_but,
     #send_form .mes_stop,
     #options_button
