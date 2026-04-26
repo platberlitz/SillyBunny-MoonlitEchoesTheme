@@ -3965,6 +3965,17 @@ body.hushstyle {
         max-height: 100% !important;
         min-height: 0 !important;
     }
+
+    body:has(#sb-topbar-stack) .drawer-content,
+    body:has(.sb-shell-root) .drawer-content {
+        max-height: calc(100dvh - var(--topBarBlockSize)) !important;
+    }
+
+    body:has(#sb-topbar-stack) :is(#left-nav-panel, #right-nav-panel, #WorldInfo) .sb-shell-panel-scroller,
+    body:has(.sb-shell-root) :is(#left-nav-panel, #right-nav-panel, #WorldInfo) .sb-shell-panel-scroller {
+        padding-bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
+        scroll-padding-bottom: max(8px, env(safe-area-inset-bottom, 0px)) !important;
+    }
 }
 
 #send_form {
