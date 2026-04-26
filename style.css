@@ -3893,6 +3893,15 @@ body.hushstyle {
     );
     --sb-chatbar-surface-bg: color-mix(in srgb, var(--SmartThemeBlurTintColor) 94%, transparent);
     --sb-mobile-overlay-bg: color-mix(in srgb, var(--SmartThemeBlurTintColor) 96%, transparent);
+    --moonlit-sb-composer-button-radius: var(--sb-radius-button, 10px);
+    --moonlit-sb-composer-button-size: var(--bottomFormBlockSize, 42px);
+    --moonlit-sb-composer-icon-size: calc(var(--bottomFormIconSize, 24px) * 0.72);
+    --moonlit-sb-ripple-avatar-mobile-height: calc(var(--moonlit-sb-ripple-avatar-mobile-width) * var(--customRippleAvatarRatio, 1.5));
+    --moonlit-sb-ripple-avatar-mobile-width: var(--customRippleAvatarMobileWidth, 100px);
+    --moonlit-sb-swipe-control-size: 24px;
+    --moonlit-sb-swipe-counter-width: 44px;
+    --moonlit-sb-swipe-edge-offset: 8px;
+    --moonlit-sb-swipe-gap: 4px;
 }
 
 #top-bar {
@@ -3929,6 +3938,128 @@ body.hushstyle {
 #send_form:focus-within #send_but {
     color: var(--SmartThemeBodyColor) !important;
     text-shadow: none !important;
+}
+
+body:has(#sb-chatbar) #send_form {
+    margin-bottom: var(--sb-chat-composer-gap, 5px) !important;
+}
+
+body:has(#sb-chatbar) #nonQRFormItems {
+    align-items: center !important;
+}
+
+body:has(#sb-chatbar) #leftSendForm,
+body:has(#sb-chatbar) #rightSendForm {
+    align-items: center !important;
+    gap: 6px;
+    min-width: 0;
+}
+
+body:has(#sb-chatbar) :is(
+    #leftSendForm > div:not(.displayNone):not([style*="display: none"]):not([style*="display:none"]),
+    #rightSendForm > div:not(.mes_stop):not(.displayNone):not([style*="display: none"]):not([style*="display:none"]),
+    #send_but:not(.displayNone):not([style*="display: none"]):not([style*="display:none"]),
+    #send_form.sb-generating-controls .mes_stop,
+    #options_button
+) {
+    align-items: center !important;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--moonlit-sb-composer-button-radius) !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    flex: 0 0 var(--moonlit-sb-composer-button-size) !important;
+    font-size: var(--moonlit-sb-composer-icon-size) !important;
+    height: var(--moonlit-sb-composer-button-size) !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    max-height: var(--moonlit-sb-composer-button-size) !important;
+    max-width: var(--moonlit-sb-composer-button-size) !important;
+    min-height: var(--moonlit-sb-composer-button-size) !important;
+    min-width: var(--moonlit-sb-composer-button-size) !important;
+    padding: 0 !important;
+    text-align: center !important;
+    text-shadow: none !important;
+    transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, opacity 180ms ease !important;
+    width: var(--moonlit-sb-composer-button-size) !important;
+}
+
+body:has(#sb-chatbar) #send_form:not(.sb-generating-controls) .mes_stop {
+    display: none !important;
+}
+
+body:has(#sb-chatbar) :is(
+    #leftSendForm > div,
+    #rightSendForm > div,
+    #send_form .mes_stop,
+    #options_button
+) > :is(i, svg),
+body:has(#sb-chatbar) :is(#send_but, #options_button)::before {
+    align-items: center !important;
+    display: inline-flex !important;
+    height: 1em !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    width: 1em !important;
+}
+
+body:has(#sb-chatbar) :is(
+    #leftSendForm > div,
+    #rightSendForm > div:not(.mes_stop),
+    #send_but,
+    #send_form .mes_stop,
+    #options_button
+):is(:hover, :focus-visible) {
+    background: var(--sb-button-hover, color-mix(in srgb, var(--SmartThemeQuoteColor) 14%, transparent)) !important;
+    filter: none !important;
+    opacity: 1 !important;
+}
+
+body:has(#sb-chatbar) :is(
+    #leftSendForm > div,
+    #rightSendForm > div:not(.mes_stop),
+    #send_but,
+    #send_form .mes_stop,
+    #options_button
+):focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-focus-ring, var(--customThemeColor)) 24%, transparent) !important;
+    outline: 1px solid color-mix(in srgb, var(--sb-focus-ring, var(--customThemeColor)) 70%, transparent) !important;
+    outline-offset: 2px;
+}
+
+#sb-chatbar .sb-chatbar-button,
+#sb-mobile-chat-tools-panel .sb-chatbar-button {
+    align-items: center !important;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--sb-chatbar-button-radius, var(--sb-icon-control-radius, 10px)) !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    flex: 0 0 var(--sb-chatbar-button-size, 30px) !important;
+    height: var(--sb-chatbar-button-size, 30px) !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    max-height: var(--sb-chatbar-button-size, 30px) !important;
+    max-width: var(--sb-chatbar-button-size, 30px) !important;
+    min-height: var(--sb-chatbar-button-size, 30px) !important;
+    min-width: var(--sb-chatbar-button-size, 30px) !important;
+    padding: 0 !important;
+    text-align: center !important;
+    width: var(--sb-chatbar-button-size, 30px) !important;
+}
+
+#sb-chatbar .sb-chatbar-button > i,
+#sb-mobile-chat-tools-panel .sb-chatbar-button > i {
+    display: block;
+    line-height: 1;
+    margin: 0;
+}
+
+#sb-chatbar .sb-chatbar-button:is(:hover, :focus-visible),
+#sb-mobile-chat-tools-panel .sb-chatbar-button:is(:hover, :focus-visible) {
+    background: var(--sb-button-hover, color-mix(in srgb, var(--SmartThemeQuoteColor) 14%, transparent)) !important;
+    color: var(--SmartThemeBodyColor) !important;
 }
 
 .inline-drawer-header,
@@ -3976,7 +4107,11 @@ input[type="number"].moonlit-neo-range-input,
     color: var(--SmartThemeBodyColor) !important;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1000px) {
+    body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes {
+        position: relative !important;
+    }
+
     body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) .mesAvatarWrapper {
         align-content: flex-start;
         align-items: center;
@@ -4008,54 +4143,74 @@ input[type="number"].moonlit-neo-range-input,
 
     body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipeRightBlock {
         align-items: center;
-        bottom: 8px !important;
+        bottom: var(--moonlit-sb-swipe-edge-offset) !important;
         display: flex;
-        gap: 4px;
-        inline-size: auto !important;
+        flex-direction: row-reverse !important;
+        gap: var(--moonlit-sb-swipe-gap);
+        inline-size: calc(var(--moonlit-sb-swipe-control-size) + var(--moonlit-sb-swipe-counter-width) + var(--moonlit-sb-swipe-gap)) !important;
         justify-content: flex-end;
         left: auto !important;
-        max-inline-size: calc(100% - 16px);
-        min-inline-size: 0;
-        right: 8px !important;
+        max-inline-size: calc(100% - (var(--moonlit-sb-swipe-edge-offset) * 2));
+        min-inline-size: calc(var(--moonlit-sb-swipe-control-size) + var(--moonlit-sb-swipe-counter-width) + var(--moonlit-sb-swipe-gap));
+        pointer-events: none;
+        position: absolute !important;
+        right: var(--moonlit-sb-swipe-edge-offset) !important;
     }
 
     body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipe_left {
-        bottom: 8px !important;
+        bottom: var(--moonlit-sb-swipe-edge-offset) !important;
         left: auto !important;
-        right: 58px !important;
+        position: absolute !important;
+        right: calc(var(--moonlit-sb-swipe-edge-offset) + var(--moonlit-sb-swipe-control-size) + var(--moonlit-sb-swipe-counter-width) + (var(--moonlit-sb-swipe-gap) * 2)) !important;
     }
 
     body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes :is(.swipe_left, .swipe_right) {
+        align-items: center;
+        display: inline-flex;
+        height: var(--moonlit-sb-swipe-control-size);
+        justify-content: center;
+        line-height: 1;
+        min-width: var(--moonlit-sb-swipe-control-size);
+        pointer-events: auto;
+        width: var(--moonlit-sb-swipe-control-size);
         transform: none !important;
     }
 
     body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipes-counter {
         letter-spacing: 0;
-        margin: 0 4px 0 0;
-        max-width: 48px;
-        min-width: 32px;
+        margin: 0;
+        max-width: var(--moonlit-sb-swipe-counter-width);
+        min-width: var(--moonlit-sb-swipe-counter-width);
         overflow: hidden;
+        pointer-events: auto;
         text-overflow: ellipsis;
-        width: auto !important;
+        width: var(--moonlit-sb-swipe-counter-width) !important;
     }
 
     body.ripplestyle #chat .mes:not(.smallSysMes) {
         align-items: start;
         display: grid !important;
-        grid-template-columns: minmax(0, var(--customRippleAvatarMobileWidth)) minmax(0, 1fr) !important;
+        grid-template-columns: minmax(0, var(--moonlit-sb-ripple-avatar-mobile-width)) minmax(0, 1fr) !important;
+        gap: 0;
         overflow: hidden;
     }
 
     body.ripplestyle #chat .mes:not(.smallSysMes) .mesAvatarWrapper {
         align-content: start;
         align-self: start !important;
+        box-sizing: border-box;
+        grid-column: 1;
+        grid-row: 1;
         height: auto !important;
         margin: 0 !important;
+        max-width: var(--moonlit-sb-ripple-avatar-mobile-width) !important;
         min-height: 0 !important;
-        overflow: visible !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
         padding: 0 !important;
         position: relative !important;
         top: auto !important;
+        width: var(--moonlit-sb-ripple-avatar-mobile-width) !important;
     }
 
     body.ripplestyle #chat .last_mes:not(.smallSysMes) .mesAvatarWrapper {
@@ -4064,15 +4219,27 @@ input[type="number"].moonlit-neo-range-input,
 
     body.ripplestyle #chat .mes:not(.smallSysMes) .mesAvatarWrapper .avatar,
     body.ripplestyle #chat .mes:not(.smallSysMes) .mesAvatarWrapper .avatar > img {
-        height: calc(var(--customRippleAvatarMobileWidth) * var(--customRippleAvatarRatio)) !important;
-        max-height: calc(var(--customRippleAvatarMobileWidth) * var(--customRippleAvatarRatio)) !important;
-        max-width: var(--customRippleAvatarMobileWidth) !important;
-        min-height: calc(var(--customRippleAvatarMobileWidth) * var(--customRippleAvatarRatio)) !important;
-        min-width: var(--customRippleAvatarMobileWidth) !important;
-        width: var(--customRippleAvatarMobileWidth) !important;
+        height: var(--moonlit-sb-ripple-avatar-mobile-height) !important;
+        max-height: var(--moonlit-sb-ripple-avatar-mobile-height) !important;
+        max-width: var(--moonlit-sb-ripple-avatar-mobile-width) !important;
+        min-height: var(--moonlit-sb-ripple-avatar-mobile-height) !important;
+        min-width: var(--moonlit-sb-ripple-avatar-mobile-width) !important;
+        width: var(--moonlit-sb-ripple-avatar-mobile-width) !important;
+    }
+
+    body.ripplestyle #chat .mes:not(.smallSysMes) .mesAvatarWrapper .avatar {
+        overflow: hidden !important;
+    }
+
+    body.ripplestyle #chat .mes:not(.smallSysMes) .mesAvatarWrapper .avatar > img {
+        display: block;
+        object-fit: cover;
+        overflow: hidden !important;
     }
 
     body.ripplestyle #chat .mes:not(.smallSysMes) .mes_block {
+        grid-column: 2;
+        grid-row: 1;
         min-width: 0;
         padding: 12px 10px 10px !important;
     }

@@ -732,7 +732,8 @@ function addThemeCreatorInfo(container) {
         <small id="moonlit-echoes-creator">
             <span>Created with Heartfelt Passion by</span>
             <a href="https://github.com/RivelleDays" target="_blank" rel="noopener noreferrer">Rivelle</a><br>
-            <span>Dedicated to All 可愛 (Kind & Wonderful) People</span>
+            <span>Dedicated to All 可愛 (Kind & Wonderful) People</span><br>
+            <a href="${EXTENSION_REPOSITORY_URL}" target="_blank" rel="noopener noreferrer">This is a fork specifically modified for SillyBunny. Redirect all fork issues to purachina on Github.</a>
         </small>
     `;
 
