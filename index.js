@@ -4,7 +4,7 @@
  */
 
 // Global settings and constants
-import { EXTENSION_NAME, EXTENSION_ID, EXTENSION_FOLDER_PATH, THEME_VERSION } from './src/config/theme-info.js';
+import { EXTENSION_NAME, EXTENSION_ID, EXTENSION_FOLDER_PATH, THEME_VERSION, EXTENSION_REPOSITORY_URL } from './src/config/theme-info.js';
 export { THEME_VERSION } from './src/config/theme-info.js';
 
 // Import required functions for drag functionality
@@ -14,6 +14,7 @@ import { t } from '../../../i18n.js';
 import { tabMappings, themeCustomSettings } from './src/config/theme-settings.js';
 import { settingsKey, getSettings as getExtensionSettings, saveSettings as saveExtensionSettings } from './src/services/settings-service.js';
 import { initializeSlashCommands } from './src/services/slash-commands.js';
+import { initChatStyleIntegration, syncChatStyleEnabledState } from './src/services/chat-styles.js';
 import { initExtension } from './src/bootstrap/init-extension.js';
 import './src/bootstrap/lifecycle-hooks.js';
 import { initControls, toggleSettingsPopout } from './src/ui/controls.js';
@@ -37,9 +38,6 @@ import { applyAllThemeSettings as applyAllThemeSettingsCore } from './src/core/t
 import { initAvatarInjector } from './src/core/observers.js';
 import { addThemeButtonsHint } from './src/services/hints.js';
 import { integrateWithThemeSelector } from './src/services/theme-selector.js';
-
-// Track if custom chat styles have been added
-let customChatStylesAdded = false;
 
 export function applyAllThemeSettings(contextOverride) {
     return applyAllThemeSettingsCore(settingsKey, themeCustomSettings, contextOverride);
@@ -213,7 +211,7 @@ function addThumbnailTip(container) {
     // Set tip content, more concise
     tipContent.innerHTML = `
         <div style="line-height: 1.4;">
-            <span data-i18n="Please refer to the">Please refer to the</span> <a href="https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme" target="_blank">Moonlit Echoes Theme GitHub README</a> <span data-i18n="and complete the necessary setup.">and complete the necessary setup.</span>
+            <span data-i18n="Please refer to the">Please refer to the</span> <a href="${EXTENSION_REPOSITORY_URL}" target="_blank">Moonlit Echoes Theme GitHub README</a> <span data-i18n="and complete the necessary setup.">and complete the necessary setup.</span>
             </div>
         </div>
     `;
@@ -415,10 +413,11 @@ export function toggleCss(shouldLoad) {
     if (shouldLoad) {
         // Determine base URL path
         const baseUrl = getBaseUrl();
+        const cssVersion = encodeURIComponent(THEME_VERSION);
 
         // Load theme style
         if (!existingLinkStyle) {
-            const cssUrl = baseUrl + '/style.css';
+            const cssUrl = `${baseUrl}/style.css?v=${cssVersion}`;
             const linkStyle = document.createElement('link');
             linkStyle.id = 'MoonlitEchosTheme-style';
             linkStyle.rel = 'stylesheet';
@@ -428,7 +427,7 @@ export function toggleCss(shouldLoad) {
 
         // Load extension style
         if (!existingLinkExt) {
-            const extUrl = baseUrl + '/extension.css';
+            const extUrl = `${baseUrl}/extension.css?v=${cssVersion}`;
             const linkExt = document.createElement('link');
             linkExt.id = 'MoonlitEchosTheme-extension';
             linkExt.rel = 'stylesheet';
@@ -441,6 +440,7 @@ export function toggleCss(shouldLoad) {
 
         // Re-apply all checkbox styles if they were enabled
         updateAllCheckboxStyles(true);
+        syncChatStyleEnabledState(true);
     } else {
         // Remove CSS
         if (existingLinkStyle) existingLinkStyle.remove();
@@ -452,6 +452,7 @@ export function toggleCss(shouldLoad) {
 
         // Clear all checkbox styles
         clearAllCheckboxStyles();
+        syncChatStyleEnabledState(false);
     }
 }
 
@@ -763,7 +764,7 @@ versionContainer.innerHTML = `
     <small class="flex-container justifyCenter alignitemscenter">
         <span data-i18n="Moonlit Echoes Theme Version">Moonlit Echoes Theme Version</span>
         <a id="moonlit-echoes-version"
-            href="https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme"
+            href="${EXTENSION_REPOSITORY_URL}"
             target="_blank"
             rel="noopener noreferrer"
             style="margin-left: 5px;">${THEME_VERSION}</a>
@@ -779,77 +780,7 @@ container.appendChild(versionContainer);
  * Handle switching between different chat styles
  */
 function initChatDisplaySwitcher() {
-    const context = SillyTavern.getContext();
-    const settings = getExtensionSettings(context);
-
-    const themeSelect = document.getElementById("themes");
-    const chatDisplaySelect = document.getElementById("chat_display");
-    if (!themeSelect || !chatDisplaySelect) return;
-
-    // Add our custom options exactly once (regardless of theme enabled)
-    function addCustomStyleOptions() {
-        if (customChatStylesAdded) return;
-
-        const ensureOption = (value, label) => {
-            if (!chatDisplaySelect.querySelector(`option[value="${value}"]`)) {
-                const opt = document.createElement("option");
-                opt.value = value;
-                opt.text = label;
-                chatDisplaySelect.appendChild(opt);
-            }
-        };
-
-        // Ensure all custom styles exist
-        ensureOption("3", t`Echo`);
-        ensureOption("4", t`Whisper`);
-        ensureOption("5", t`Hush`);
-        ensureOption("6", t`Ripple`);
-        ensureOption("7", t`Tide`);
-
-        customChatStylesAdded = true;
-    }
-
-    // Apply the selected chat style by toggling body classes
-    function applyChatDisplayStyle() {
-        document.body.classList.remove(
-            "flatchat","bubblechat","documentstyle",
-            "echostyle","whisperstyle","hushstyle",
-            "ripplestyle","tidestyle"
-        );
-
-        switch (chatDisplaySelect.value) {
-            case "0": document.body.classList.add("flatchat"); break;
-            case "1": document.body.classList.add("bubblechat"); break;
-            case "2": document.body.classList.add("documentstyle"); break;
-            case "3": document.body.classList.add("echostyle"); break;
-            case "4": document.body.classList.add("whisperstyle"); break;
-            case "5": document.body.classList.add("hushstyle"); break;
-            case "6": document.body.classList.add("ripplestyle"); break;
-            case "7": document.body.classList.add("tidestyle"); break;
-        }
-    }
-
-    // Always add our options
-    addCustomStyleOptions();
-
-    // Restore saved selections
-    const savedTheme = localStorage.getItem("savedTheme");
-    const savedChatStyle = localStorage.getItem("savedChatStyle");
-    if (savedTheme) themeSelect.value = savedTheme;
-    if (savedChatStyle) chatDisplaySelect.value = savedChatStyle;
-
-    // Events
-    themeSelect.addEventListener("change", function() {
-        localStorage.setItem("savedTheme", themeSelect.value);
-        applyChatDisplayStyle();
-    });
-
-    chatDisplaySelect.addEventListener("change", function() {
-        localStorage.setItem("savedChatStyle", chatDisplaySelect.value);
-        applyChatDisplayStyle();
-    });
-
-    applyChatDisplayStyle();
+    initChatStyleIntegration({ t });
 }
 
 

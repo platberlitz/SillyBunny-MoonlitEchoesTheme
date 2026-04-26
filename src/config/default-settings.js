@@ -8,6 +8,7 @@ function generateDefaultSettings() {
     const settings = {
         enabled: true,
         useOriginalAvatarImages: false,
+        chatStyle: '',
         presets: {
             "Moonlit Echoes - by Rivelle": {}
         },

@@ -2,6 +2,10 @@
 
 **English** | [繁體中文](https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme/blob/main/.github/README-zh_Hant.md)
 
+This fork targets SillyBunny compatibility. It keeps Moonlit Echoes isolated as a third-party extension and carries its own chat style state, mobile layout guardrails, and SillyBunny shell compatibility CSS without requiring SillyBunny core changes.
+
+SillyBunny note: Moonlit's Echo, Whisper, Hush, Ripple, and Tide message styles are managed by this extension rather than SillyBunny core. If you import the included UI theme files, their core `chat_display` value stays on Flat for SillyBunny compatibility; choose Moonlit styles from Appearance or the Moonlit slash commands.
+
 ![](https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme/blob/main/.github/ImagePreview/visual_novel_mode.png)
 
 **Moonlit Echoes 月下回聲** is a UI theme designed for SillyTavern. It has been customized and refined based on my personal preferences to create a more modern, elegant, and minimalist interface while enhancing the user experience across both desktop and mobile platforms.
@@ -44,7 +48,7 @@ It is recommended to use the **latest version** of SillyTavern (either Release o
 ### 1. **Install Moonlit Echoes Theme**
 In the **SillyTavern Extension Manager**, use "Install from URL" and paste the following Git URL:
    ```
-   https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme
+   https://github.com/platberlitz/SillyBunny-MoonlitEchoesTheme
    ```
 
 ### 2. **Update to `/SillyTavern/config.yaml` for thumbnail settings**
@@ -71,8 +75,8 @@ The Moonlit Echoes theme extension is ready to use after installation. However, 
 The newly added **"Glimmer (微光)"** theme in version 2.5.0 is especially recommended. This theme was specially designed for this release—minimalist, versatile, and perfect for using your phone under the covers at night.
 You can find it in the GitHub theme folder or download it directly below:
 
-- [Glimmer - by Rivelle.json](https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme/blob/main/theme/Glimmer%20-%20by%20Rivelle.json) → for SillyTavern User Settings
-- [[Moonlit] Glimmer - by Rivelle.json](https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme/blob/main/theme/%5BMoonlit%5D%20Glimmer%20-%20by%20Rivelle.json) → for Moonlit Echoes Theme Presets
+- [Glimmer - by Rivelle.json](https://github.com/platberlitz/SillyBunny-MoonlitEchoesTheme/blob/main/theme/Glimmer%20-%20by%20Rivelle.json) → for SillyTavern User Settings
+- [[Moonlit] Glimmer - by Rivelle.json](https://github.com/platberlitz/SillyBunny-MoonlitEchoesTheme/blob/main/theme/%5BMoonlit%5D%20Glimmer%20-%20by%20Rivelle.json) → for Moonlit Echoes Theme Presets
 
 No need to tweak anything—just drop the file in and you’re good to go!
 

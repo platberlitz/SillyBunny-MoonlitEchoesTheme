@@ -1,14 +1,14 @@
 {
-    "display_name": "Moonlit Echoes Theme",
+    "display_name": "Moonlit Echoes Theme (SillyBunny)",
     "description": "A modern, minimalist, and elegant theme for SillyTavern. Inspired by moonlit nights and gentle echoes of serenity.",
     "loading_order": 10,
     "requires": [],
     "optional": [],
     "js": "index.js",
     "author": "Rivelle <rivelle.days@gmail.com>",
-    "version": "3.1.0",
+    "version": "3.1.1-sb1",
     "license": "AGPL-3.0",
-    "homepage": "https://github.com/RivelleDays/SillyTavern-MoonlitEchoesTheme",
+    "homepage": "https://github.com/platberlitz/SillyBunny-MoonlitEchoesTheme",
     "auto_update": true,
     "i18n": {
         "zh-tw": "i18n/zh-tw.json",

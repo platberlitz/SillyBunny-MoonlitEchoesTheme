@@ -867,7 +867,8 @@ export const themeCustomSettings = [
                 /* Mobile Chat Input Overall */
                 #send_form {
                     margin-bottom: 0 !important;
-                    min-height: 100% !important;
+                    min-height: 0 !important;
+                    height: auto !important;
                     padding: 5px 15px;
                     padding-top: 8px;
                     border-radius: 15px 15px 0 0 !important;

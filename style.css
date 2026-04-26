@@ -26,6 +26,12 @@ body {
 
 :root {
     --custom-avatar: calc(var(--avatar-base-width) * 0.8);
+    --custom-chat-avatar-size: var(--custom-ChatAvatar, 40px);
+    --custom-chat-avatar-frame-size: calc(var(--custom-chat-avatar-size) + 8px);
+    --custom-big-chat-avatar-width: calc(var(--custom-chat-avatar-size) * var(--big-avatar-width-factor));
+    --custom-big-chat-avatar-height: calc(var(--custom-chat-avatar-size) * var(--big-avatar-height-factor));
+    --custom-big-chat-avatar-frame-width: calc(var(--custom-big-chat-avatar-width) + 8px);
+    --custom-big-chat-avatar-frame-height: calc(var(--custom-big-chat-avatar-height) + 8px);
     --customThemeMenuColor: var(--SmartThemeChatTintColor);
     --active: var(--customThemeColor);
     --SmartThemeCheckboxTickColor: var(--SmartThemeBlurTintColor);
@@ -48,7 +54,7 @@ body {
     /* !!! Important: Do Not Modify 不要修改 !!! */
     --topBarBlockSize: calc(var(--topBarIconSize) + var(--topBarBlockPadding) - 1px);
     --bottomInputAreaHeight: 115px;
-    --custom-echo-avatar: calc(var(--custom-ChatAvatar, 40px) + 8px);
+    --custom-echo-avatar: var(--custom-chat-avatar-frame-size);
 }
 @media screen and (max-width: 1000px) {
     :root {
@@ -937,25 +943,40 @@ body.movingUI ::-webkit-scrollbar-thumb:vertical {
 
         /* General Avatar 一般頭像 */
         .avatar {
+            box-sizing: border-box;
             display: flex;
+            flex: 0 0 var(--custom-chat-avatar-frame-size);
             justify-content: center;
             align-items: center;
-            width: calc(var(--custom-ChatAvatar, 40px) + 8px);
-            height: calc(var(--custom-ChatAvatar, 40px) + 8px);
-            max-width: calc(var(--custom-ChatAvatar, 40px) + 8px);
-            max-height: calc(var(--custom-ChatAvatar, 40px) + 8px);
+            width: var(--custom-chat-avatar-frame-size);
+            height: var(--custom-chat-avatar-frame-size);
+            min-width: var(--custom-chat-avatar-frame-size);
+            min-height: var(--custom-chat-avatar-frame-size);
+            max-width: var(--custom-chat-avatar-frame-size);
+            max-height: var(--custom-chat-avatar-frame-size);
             border: 1px solid var(--SmartThemeBodyColor);
+            overflow: hidden;
 
             img {
-                width: var(--custom-ChatAvatar, 40px);
-                height: var(--custom-ChatAvatar, 40px);
-                max-width: var(--custom-ChatAvatar) !important;
-                max-height: var(--custom-ChatAvatar) !important;
+                display: block;
+                box-sizing: border-box;
+                flex: 0 0 var(--custom-chat-avatar-size);
+                width: var(--custom-chat-avatar-size);
+                height: var(--custom-chat-avatar-size);
+                min-width: var(--custom-chat-avatar-size) !important;
+                min-height: var(--custom-chat-avatar-size) !important;
+                max-width: var(--custom-chat-avatar-size) !important;
+                max-height: var(--custom-chat-avatar-size) !important;
                 border: 0 !important;
+                object-fit: cover;
+                object-position: center;
             }
         }
         /* User Avatar 使用者頭像 */
         .mesAvatarWrapper {
+            flex: 0 0 var(--custom-chat-avatar-frame-size);
+            width: var(--custom-chat-avatar-frame-size);
+            min-width: var(--custom-chat-avatar-frame-size);
             padding-right: 0;
             margin-right: calc(var(--customMesPadding) / 2);
         }
@@ -1140,28 +1161,41 @@ body.big-avatars #chat .mes {
     .mes_block {
         border-radius: 10px;
     }
+    .mesAvatarWrapper {
+        flex-basis: var(--custom-big-chat-avatar-frame-width);
+        width: var(--custom-big-chat-avatar-frame-width);
+        min-width: var(--custom-big-chat-avatar-frame-width) !important;
+    }
     .avatar {
-        width: calc((var(--custom-ChatAvatar) * var(--big-avatar-width-factor)) + 8px);
-        height: calc((var(--custom-ChatAvatar) * var(--big-avatar-height-factor)) + 8px);
-        min-width: calc((var(--custom-ChatAvatar) * var(--big-avatar-width-factor)) + 8px) !important;
-        min-height: calc((var(--custom-ChatAvatar) * var(--big-avatar-height-factor)) + 8px) !important;
+        flex-basis: var(--custom-big-chat-avatar-frame-width);
+        width: var(--custom-big-chat-avatar-frame-width);
+        height: var(--custom-big-chat-avatar-frame-height);
+        min-width: var(--custom-big-chat-avatar-frame-width) !important;
+        min-height: var(--custom-big-chat-avatar-frame-height) !important;
+        max-width: var(--custom-big-chat-avatar-frame-width) !important;
+        max-height: var(--custom-big-chat-avatar-frame-height) !important;
 
         img {
-            width: calc(var(--custom-ChatAvatar) * var(--big-avatar-width-factor));
-            height: calc(var(--custom-ChatAvatar) * var(--big-avatar-height-factor));
-            min-width: calc(var(--custom-ChatAvatar) * var(--big-avatar-width-factor)) !important;
-            min-height: calc(var(--custom-ChatAvatar) * var(--big-avatar-height-factor)) !important;
+            flex-basis: var(--custom-big-chat-avatar-width);
+            width: var(--custom-big-chat-avatar-width);
+            height: var(--custom-big-chat-avatar-height);
+            min-width: var(--custom-big-chat-avatar-width) !important;
+            min-height: var(--custom-big-chat-avatar-height) !important;
+            max-width: var(--custom-big-chat-avatar-width) !important;
+            max-height: var(--custom-big-chat-avatar-height) !important;
         }
     }
 }
 body.big-avatars #chat .mes[is_user="true"] {
     .avatar {
-        width: calc((var(--custom-ChatAvatar) * var(--big-avatar-width-factor)) + 8px);
-        height: calc((var(--custom-ChatAvatar) * var(--big-avatar-height-factor)) + 8px);
+        flex-basis: var(--custom-big-chat-avatar-frame-width);
+        width: var(--custom-big-chat-avatar-frame-width);
+        height: var(--custom-big-chat-avatar-frame-height);
 
         img {
-            width: calc(var(--custom-ChatAvatar) * var(--big-avatar-width-factor));
-            height: calc(var(--custom-ChatAvatar) * var(--big-avatar-height-factor));
+            flex-basis: var(--custom-big-chat-avatar-width);
+            width: var(--custom-big-chat-avatar-width);
+            height: var(--custom-big-chat-avatar-height);
         }
     }
 }
@@ -3846,4 +3880,200 @@ body.hushstyle {
 
 #ReverseProxyWarningMessage {
     color: red !important;
+}
+
+/* SillyBunny compatibility guardrails. These live in the extension so core
+   SillyBunny does not need Moonlit-specific CSS. */
+:root {
+    --sb-shell-main-bg: color-mix(in srgb, var(--SmartThemeBlurTintColor) 95%, transparent);
+    --sb-card-bg: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--SmartThemeBodyColor) 6%, var(--SmartThemeBlurTintColor)),
+        color-mix(in srgb, var(--SmartThemeBlurTintColor) 92%, transparent)
+    );
+    --sb-chatbar-surface-bg: color-mix(in srgb, var(--SmartThemeBlurTintColor) 94%, transparent);
+    --sb-mobile-overlay-bg: color-mix(in srgb, var(--SmartThemeBlurTintColor) 96%, transparent);
+}
+
+#top-bar {
+    background: var(--sb-topbar-surface-bg, color-mix(in srgb, var(--SmartThemeBlurTintColor) 92%, transparent)) !important;
+    border-color: var(--sb-shell-border, color-mix(in srgb, var(--SmartThemeBorderColor) 78%, transparent)) !important;
+}
+
+#sb-chatbar,
+#sb-connection-strip,
+#sb-mobile-nav-panel,
+#sb-mobile-chat-tools-panel,
+#left-nav-panel,
+#right-nav-panel,
+.drawer-content,
+.inline-drawer-content,
+.popup,
+.sb-shell-root .sb-shell-frame,
+.sb-shell-callout,
+.sb-admin-card,
+.sb-theme-card,
+.sb-shell-empty-state {
+    background: var(--sb-mobile-panel-bg, var(--sb-shell-main-bg)) !important;
+    border-color: var(--sb-shell-border, color-mix(in srgb, var(--SmartThemeBorderColor) 70%, transparent)) !important;
+}
+
+#send_form {
+    opacity: 1 !important;
+}
+
+#send_form:focus-within {
+    border-color: var(--sb-input-border, color-mix(in srgb, var(--SmartThemeBorderColor) 86%, transparent)) !important;
+}
+
+#send_form:focus-within #send_but {
+    color: var(--SmartThemeBodyColor) !important;
+    text-shadow: none !important;
+}
+
+.inline-drawer-header,
+.inline-drawer-toggle.inline-drawer-header,
+.moonlit-preset-manager,
+.moonlit-section,
+.moonlit-section-header,
+.theme-category-header,
+.theme-setting-item,
+.sb-admin-card,
+.sb-theme-card {
+    background: var(--sb-card-bg) !important;
+    border-color: color-mix(in srgb, var(--SmartThemeBorderColor) 72%, transparent) !important;
+    color: var(--SmartThemeBodyColor) !important;
+}
+
+.menu_button,
+.right_menu_button,
+.popup-controls .menu_button,
+.menu_button.menu_button_default,
+#dialogue_popup_cancel {
+    background: var(--sb-button-bg, color-mix(in srgb, var(--SmartThemeBlurTintColor) 86%, transparent)) !important;
+    border-color: color-mix(in srgb, var(--SmartThemeBorderColor) 70%, transparent) !important;
+    color: var(--SmartThemeBodyColor) !important;
+}
+
+.menu_button:not(.disabled):not([disabled]):hover,
+.menu_button:not(.disabled):not([disabled]).active,
+.right_menu_button:not(.disabled):not([disabled]):hover,
+.right_menu_button:not(.disabled):not([disabled]).active,
+.menu_button.menu_button_default:hover,
+#dialogue_popup_cancel:hover {
+    background: var(--sb-button-hover, color-mix(in srgb, var(--SmartThemeQuoteColor) 14%, transparent)) !important;
+    color: var(--SmartThemeBodyColor) !important;
+}
+
+.text_pole,
+textarea,
+select,
+.theme-setting-container input[type="text"],
+input[type="number"].moonlit-neo-range-input,
+.moonlit-preset-selector {
+    background: var(--sb-input-bg, color-mix(in srgb, var(--SmartThemeBlurTintColor) 90%, transparent)) !important;
+    border-color: var(--sb-input-border, color-mix(in srgb, var(--SmartThemeBorderColor) 86%, transparent)) !important;
+    color: var(--SmartThemeBodyColor) !important;
+}
+
+@media screen and (max-width: 768px) {
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) .mesAvatarWrapper {
+        align-content: flex-start;
+        align-items: center;
+        gap: 4px 6px;
+        min-height: 0;
+        overflow: visible;
+        padding-bottom: 0 !important;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .last_mes:not(.smallSysMes) .mesAvatarWrapper {
+        padding-bottom: 0 !important;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) .mes_block,
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .lastInContext .mes_block {
+        margin-top: 0 !important;
+        transform: none !important;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes .mesAvatarWrapper > :is(.mesIDDisplay, .mes_timer, .tokenCounterDisplay) {
+        line-height: 1.15;
+        margin: 0;
+        max-width: 100%;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        transform: none !important;
+        white-space: normal;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipeRightBlock {
+        align-items: center;
+        bottom: 8px !important;
+        display: flex;
+        gap: 4px;
+        inline-size: auto !important;
+        justify-content: flex-end;
+        left: auto !important;
+        max-inline-size: calc(100% - 16px);
+        min-inline-size: 0;
+        right: 8px !important;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipe_left {
+        bottom: 8px !important;
+        left: auto !important;
+        right: 58px !important;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes :is(.swipe_left, .swipe_right) {
+        transform: none !important;
+    }
+
+    body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipes-counter {
+        letter-spacing: 0;
+        margin: 0 4px 0 0;
+        max-width: 48px;
+        min-width: 32px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: auto !important;
+    }
+
+    body.ripplestyle #chat .mes:not(.smallSysMes) {
+        align-items: start;
+        display: grid !important;
+        grid-template-columns: minmax(0, var(--customRippleAvatarMobileWidth)) minmax(0, 1fr) !important;
+        overflow: hidden;
+    }
+
+    body.ripplestyle #chat .mes:not(.smallSysMes) .mesAvatarWrapper {
+        align-content: start;
+        align-self: start !important;
+        height: auto !important;
+        margin: 0 !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        position: relative !important;
+        top: auto !important;
+    }
+
+    body.ripplestyle #chat .last_mes:not(.smallSysMes) .mesAvatarWrapper {
+        padding-bottom: 0 !important;
+    }
+
+    body.ripplestyle #chat .mes:not(.smallSysMes) .mesAvatarWrapper .avatar,
+    body.ripplestyle #chat .mes:not(.smallSysMes) .mesAvatarWrapper .avatar > img {
+        height: calc(var(--customRippleAvatarMobileWidth) * var(--customRippleAvatarRatio)) !important;
+        max-height: calc(var(--customRippleAvatarMobileWidth) * var(--customRippleAvatarRatio)) !important;
+        max-width: var(--customRippleAvatarMobileWidth) !important;
+        min-height: calc(var(--customRippleAvatarMobileWidth) * var(--customRippleAvatarRatio)) !important;
+        min-width: var(--customRippleAvatarMobileWidth) !important;
+        width: var(--customRippleAvatarMobileWidth) !important;
+    }
+
+    body.ripplestyle #chat .mes:not(.smallSysMes) .mes_block {
+        min-width: 0;
+        padding: 12px 10px 10px !important;
+    }
 }
