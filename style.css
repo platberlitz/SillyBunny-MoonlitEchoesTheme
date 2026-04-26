@@ -3928,6 +3928,45 @@ body.hushstyle {
     border-color: var(--sb-shell-border, color-mix(in srgb, var(--SmartThemeBorderColor) 70%, transparent)) !important;
 }
 
+@media screen and (max-width: 1000px) {
+    body:has(#sb-topbar-stack) :is(
+        #left-nav-panel,
+        #right-nav-panel,
+        #WorldInfo,
+        #sb-mobile-nav-panel,
+        #sb-mobile-chat-tools-panel
+    ),
+    body:has(.sb-shell-root) :is(
+        #left-nav-panel,
+        #right-nav-panel,
+        #WorldInfo,
+        #sb-mobile-nav-panel,
+        #sb-mobile-chat-tools-panel
+    ) {
+        height: calc(100dvh - var(--topBarBlockSize)) !important;
+        max-height: calc(100dvh - var(--topBarBlockSize)) !important;
+        min-height: 0 !important;
+    }
+
+    body:has(#sb-topbar-stack) :is(
+        #left-nav-panel,
+        #right-nav-panel,
+        #WorldInfo,
+        #sb-mobile-nav-panel,
+        #sb-mobile-chat-tools-panel
+    ) :is(.drawer-content, .inline-drawer-content, .sb-shell-panel-scroller),
+    body:has(.sb-shell-root) :is(
+        #left-nav-panel,
+        #right-nav-panel,
+        #WorldInfo,
+        #sb-mobile-nav-panel,
+        #sb-mobile-chat-tools-panel
+    ) :is(.drawer-content, .inline-drawer-content, .sb-shell-panel-scroller) {
+        max-height: 100% !important;
+        min-height: 0 !important;
+    }
+}
+
 #send_form {
     opacity: 1 !important;
 }
