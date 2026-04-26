@@ -4282,8 +4282,9 @@ input[type="number"].moonlit-neo-range-input,
         min-width: 0 !important;
         overflow: visible !important;
         padding: 0 !important;
-        position: relative !important;
-        top: auto !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 2;
         width: var(--moonlit-sb-ripple-avatar-mobile-width) !important;
     }
 
