@@ -2036,8 +2036,10 @@ body.ripplestyle #chat {
             background: none !important;
             border: none !important;
             box-shadow: none !important;
+            box-sizing: border-box;
             padding-top: 20px;
-            padding-left: 5px;
+            padding-left: 12px;
+            padding-right: 12px;
 
             .ch_name::after {
                 content: "";
@@ -4380,11 +4382,12 @@ input[type="number"].moonlit-neo-range-input,
     }
 
     body.ripplestyle #chat .mes:not(.smallSysMes) .mes_block {
+        box-sizing: border-box;
         grid-column: 2;
         grid-row: 1;
         margin: 0 !important;
         min-width: 0;
-        padding: 10px 10px 34px 12px !important;
+        padding: 10px 16px 34px 16px !important;
         width: 100% !important;
     }
 
