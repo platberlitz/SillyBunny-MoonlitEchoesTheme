@@ -2039,7 +2039,7 @@ body.ripplestyle #chat {
             box-sizing: border-box;
             padding-top: 20px;
             padding-left: 12px;
-            padding-right: 12px;
+            padding-right: 24px;
 
             .ch_name::after {
                 content: "";
@@ -4387,7 +4387,7 @@ input[type="number"].moonlit-neo-range-input,
         grid-row: 1;
         margin: 0 !important;
         min-width: 0;
-        padding: 10px 16px 34px 16px !important;
+        padding: 10px 24px 34px 16px !important;
         width: 100% !important;
     }
 
