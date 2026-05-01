@@ -1630,6 +1630,16 @@ body.echostyle #chat {
         }
     }
 
+    /* Desktop: Prevent swipe button overflow */
+    @media screen and (min-width: 1001px) {
+        .last_mes .swipeRightBlock {
+            right: 15px;
+        }
+        .mes {
+            overflow: hidden;
+        }
+    }
+
     .lastInContext {
         border-top: var(--customlastInContext) !important;
         opacity: 1 !important;
@@ -1819,6 +1829,19 @@ body.whisperstyle #chat {
         }
     }
 
+    /* Desktop: Prevent swipe button and avatar overflow */
+    @media screen and (min-width: 1001px) {
+        .last_mes .swipeRightBlock {
+            right: 30px;
+        }
+        .mes {
+            overflow: hidden;
+        }
+        .mes::before {
+            max-width: 45%;
+        }
+    }
+
     .menu_button {
         background: color-mix(in srgb, var(--SmartThemeBlurTintColor) 25%, transparent);
     }
@@ -1971,6 +1994,16 @@ body.hushstyle #chat {
             letter-spacing: 1.5px;
         }
     }
+
+    /* Desktop: Prevent swipe button overflow */
+    @media screen and (min-width: 1001px) {
+        .last_mes .swipeRightBlock {
+            right: 30px;
+        }
+        .mes {
+            overflow: hidden;
+        }
+    }
 }
 
 /* --- Chat Style: Ripple 聊天風格：「漣漪」 --- */
@@ -2056,6 +2089,19 @@ body.ripplestyle #chat {
         .swipeRightBlock,
         .swipe_left {
             bottom: 10px !important;
+        }
+    }
+
+    /* Desktop: Prevent avatar and swipe button overflow */
+    @media screen and (min-width: 1001px) {
+        .mes {
+            overflow: hidden;
+        }
+        .mes .mesAvatarWrapper {
+            max-width: 35%;
+        }
+        .last_mes .swipeRightBlock {
+            right: 15px;
         }
     }
 
