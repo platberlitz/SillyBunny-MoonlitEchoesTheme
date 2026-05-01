@@ -1630,13 +1630,10 @@ body.echostyle #chat {
         }
     }
 
-    /* Desktop: Prevent swipe button overflow */
+    /* Desktop: keep swipe controls inside the message without clipping content. */
     @media screen and (min-width: 1001px) {
         .last_mes .swipeRightBlock {
             right: 15px;
-        }
-        .mes {
-            overflow: hidden;
         }
     }
 
@@ -1829,16 +1826,10 @@ body.whisperstyle #chat {
         }
     }
 
-    /* Desktop: Prevent swipe button and avatar overflow */
+    /* Desktop: keep swipe controls inside the message without clipping content. */
     @media screen and (min-width: 1001px) {
         .last_mes .swipeRightBlock {
             right: 30px;
-        }
-        .mes {
-            overflow: hidden;
-        }
-        .mes::before {
-            max-width: 45%;
         }
     }
 
@@ -1995,13 +1986,10 @@ body.hushstyle #chat {
         }
     }
 
-    /* Desktop: Prevent swipe button overflow */
+    /* Desktop: keep swipe controls inside the message without clipping content. */
     @media screen and (min-width: 1001px) {
         .last_mes .swipeRightBlock {
             right: 30px;
-        }
-        .mes {
-            overflow: hidden;
         }
     }
 }
@@ -2092,13 +2080,36 @@ body.ripplestyle #chat {
         }
     }
 
-    /* Desktop: Prevent avatar and swipe button overflow */
+    /* Desktop: reserve real flex space for Ripple avatars so text cannot slide underneath. */
     @media screen and (min-width: 1001px) {
-        .mes {
-            overflow: hidden;
-        }
         .mes .mesAvatarWrapper {
-            max-width: 35%;
+            box-sizing: border-box;
+            flex: 0 0 var(--moonlit-sb-ripple-avatar-desktop-width);
+            min-width: var(--moonlit-sb-ripple-avatar-desktop-width);
+            overflow: visible;
+            width: var(--moonlit-sb-ripple-avatar-desktop-width);
+        }
+        .mes .mesAvatarWrapper .avatar,
+        .mes .mesAvatarWrapper .avatar img {
+            max-width: 100% !important;
+            min-width: 100% !important;
+            width: 100% !important;
+        }
+        .mes .mesAvatarWrapper .avatar {
+            aspect-ratio: 1 / var(--customRippleAvatarRatio);
+            height: auto;
+            max-height: none !important;
+            min-height: 0;
+        }
+        .mes .mesAvatarWrapper .avatar img {
+            height: 100% !important;
+            max-height: none !important;
+            min-height: 100% !important;
+        }
+        .mes .mes_block {
+            flex: 1 1 auto;
+            min-width: 0;
+            width: auto;
         }
         .last_mes .swipeRightBlock {
             right: 15px;
@@ -3947,6 +3958,7 @@ body.hushstyle {
     --moonlit-sb-composer-icon-size: calc(var(--bottomFormIconSize, 24px) * 0.72);
     --moonlit-sb-ripple-avatar-mobile-height: calc(var(--moonlit-sb-ripple-avatar-mobile-width) * var(--customRippleAvatarRatio, 1.5));
     --moonlit-sb-ripple-avatar-mobile-width: var(--customRippleAvatarMobileWidth, 100px);
+    --moonlit-sb-ripple-avatar-desktop-width: min(var(--customRippleAvatarWidth, 180px), 35%);
     --moonlit-sb-swipe-control-size: 24px;
     --moonlit-sb-swipe-counter-width: 38px;
     --moonlit-sb-swipe-edge-offset: 8px;
