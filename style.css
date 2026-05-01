@@ -3963,6 +3963,7 @@ body.hushstyle {
     --moonlit-sb-swipe-counter-width: 38px;
     --moonlit-sb-swipe-edge-offset: 8px;
     --moonlit-sb-swipe-gap: 4px;
+    --moonlit-sb-swipe-inline-offset: 24px;
 }
 
 #top-bar {
@@ -4230,6 +4231,60 @@ body.hushstyle {
     color: var(--SmartThemeBodyColor) !important;
 }
 
+body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipeRightBlock {
+    align-items: center;
+    bottom: var(--moonlit-sb-swipe-edge-offset) !important;
+    box-sizing: border-box;
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    gap: var(--moonlit-sb-swipe-gap);
+    inline-size: calc(var(--moonlit-sb-swipe-control-size) + var(--moonlit-sb-swipe-counter-width) + var(--moonlit-sb-swipe-gap)) !important;
+    justify-content: flex-end;
+    left: auto !important;
+    max-inline-size: calc(100% - (var(--moonlit-sb-swipe-inline-offset) * 2));
+    min-inline-size: calc(var(--moonlit-sb-swipe-control-size) + var(--moonlit-sb-swipe-counter-width) + var(--moonlit-sb-swipe-gap));
+    overflow: visible;
+    pointer-events: none;
+    position: absolute !important;
+    right: var(--moonlit-sb-swipe-inline-offset) !important;
+}
+
+body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipe_left {
+    bottom: var(--moonlit-sb-swipe-edge-offset) !important;
+    left: auto !important;
+    position: absolute !important;
+    right: calc(var(--moonlit-sb-swipe-inline-offset) + var(--moonlit-sb-swipe-control-size) + var(--moonlit-sb-swipe-counter-width) + (var(--moonlit-sb-swipe-gap) * 2)) !important;
+}
+
+body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes :is(.swipe_left, .swipe_right) {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 var(--moonlit-sb-swipe-control-size);
+    height: var(--moonlit-sb-swipe-control-size);
+    justify-content: center;
+    line-height: 1;
+    min-width: var(--moonlit-sb-swipe-control-size);
+    pointer-events: auto;
+    position: relative !important;
+    right: auto !important;
+    transform: none !important;
+    width: var(--moonlit-sb-swipe-control-size);
+}
+
+body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipes-counter {
+    box-sizing: border-box;
+    flex: 0 0 var(--moonlit-sb-swipe-counter-width);
+    letter-spacing: 0;
+    margin: 0 !important;
+    max-width: var(--moonlit-sb-swipe-counter-width);
+    min-width: var(--moonlit-sb-swipe-counter-width);
+    overflow: hidden;
+    padding: 0;
+    pointer-events: auto;
+    text-overflow: ellipsis;
+    width: var(--moonlit-sb-swipe-counter-width) !important;
+}
+
 .text_pole,
 textarea,
 select,
@@ -4348,18 +4403,18 @@ input[type="number"].moonlit-neo-range-input,
         inline-size: calc(var(--moonlit-sb-swipe-control-size) + var(--moonlit-sb-swipe-counter-width) + var(--moonlit-sb-swipe-gap)) !important;
         justify-content: flex-end;
         left: auto !important;
-        max-inline-size: calc(100% - (var(--moonlit-sb-swipe-edge-offset) * 2));
+        max-inline-size: calc(100% - (var(--moonlit-sb-swipe-inline-offset) * 2));
         min-inline-size: calc(var(--moonlit-sb-swipe-control-size) + var(--moonlit-sb-swipe-counter-width) + var(--moonlit-sb-swipe-gap));
         pointer-events: none;
         position: absolute !important;
-        right: var(--moonlit-sb-swipe-edge-offset) !important;
+        right: var(--moonlit-sb-swipe-inline-offset) !important;
     }
 
     body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipe_left {
         bottom: var(--moonlit-sb-swipe-edge-offset) !important;
         left: auto !important;
         position: absolute !important;
-        right: calc(var(--moonlit-sb-swipe-edge-offset) + var(--moonlit-sb-swipe-control-size) + var(--moonlit-sb-swipe-counter-width) + (var(--moonlit-sb-swipe-gap) * 2)) !important;
+        right: calc(var(--moonlit-sb-swipe-inline-offset) + var(--moonlit-sb-swipe-control-size) + var(--moonlit-sb-swipe-counter-width) + (var(--moonlit-sb-swipe-gap) * 2)) !important;
     }
 
     body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes :is(.swipe_left, .swipe_right) {
