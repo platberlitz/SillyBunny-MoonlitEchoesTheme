@@ -3998,6 +3998,12 @@ body.hushstyle {
     --moonlit-sb-composer-button-radius: var(--sb-icon-control-radius, 10px);
     --moonlit-sb-composer-button-size: var(--bottomFormBlockSize, 42px);
     --moonlit-sb-composer-icon-size: calc(var(--bottomFormIconSize, 24px) * 0.72);
+    --moonlit-sb-send-icon-idle-color: color-mix(
+        in srgb,
+        var(--sb-on-solid-accent, var(--sb-on-accent, var(--color-background, var(--SmartThemeBlurTintColor)))) 74%,
+        var(--color-primary, var(--sb-accent, var(--SmartThemeQuoteColor))) 26%
+    );
+    --moonlit-sb-send-icon-active-color: var(--sb-on-solid-accent, var(--sb-on-accent, var(--color-background, var(--SmartThemeBlurTintColor))));
     --moonlit-sb-ripple-avatar-mobile-height: calc(var(--moonlit-sb-ripple-avatar-mobile-width) * var(--customRippleAvatarRatio, 1.5));
     --moonlit-sb-ripple-avatar-mobile-width: var(--customRippleAvatarMobileWidth, 100px);
     --moonlit-sb-ripple-avatar-desktop-width: min(var(--customRippleAvatarWidth, 180px), 35%);
@@ -4089,8 +4095,8 @@ body.hushstyle {
     border-color: var(--sb-input-border, color-mix(in srgb, var(--SmartThemeBorderColor) 86%, transparent)) !important;
 }
 
-#send_form:focus-within #send_but {
-    color: var(--SmartThemeBodyColor) !important;
+#send_form:focus-within #send_but:not(:hover):not(:focus-visible):not(:active) {
+    color: var(--moonlit-sb-send-icon-idle-color) !important;
     text-shadow: none !important;
 }
 
@@ -4191,6 +4197,10 @@ body.hushstyle {
     background: var(--sb-button-hover, color-mix(in srgb, var(--SmartThemeQuoteColor) 14%, transparent)) !important;
     filter: none !important;
     opacity: 1 !important;
+}
+
+#send_form:not(.sb-generating-controls) #send_but:is(:hover, :focus-visible, :active) {
+    color: var(--moonlit-sb-send-icon-active-color) !important;
 }
 
 #send_form :is(
