@@ -477,6 +477,11 @@ input[type="range"] {
     border: 1px solid var(--SmartThemeBorderColor);
     letter-spacing: 0.6px;
 
+    @media screen and (max-width: 1000px) {
+        margin: 3px 0;
+        padding: 6px 8px;
+    }
+
     &:hover {
         filter: none !important;
         background: var(--customBgColor1);
@@ -486,6 +491,11 @@ input[type="range"] {
 /* Expand Icon 展開圖標 */
 .inline-drawer-icon {
     font-size: calc(var(--mainFontSize)* 1.1);
+}
+@media screen and (max-width: 1000px) {
+    .inline-drawer-icon {
+        font-size: var(--mainFontSize);
+    }
 }
 
 /* Expand Content 展開內容 */
@@ -514,6 +524,34 @@ input[type="range"] {
 .menu_button {
     min-width: 30px;
     min-height: 30px;
+}
+@media screen and (max-width: 1000px) {
+    .menu_button {
+        min-width: 34px;
+        min-height: 34px;
+        padding: 4px 8px;
+        font-size: calc(var(--mainFontSize) * 0.9);
+        line-height: 1.05;
+    }
+
+    .right_menu_button {
+        min-width: 34px;
+        min-height: 34px;
+        padding: 4px 8px;
+        font-size: calc(var(--mainFontSize) * 0.9);
+        line-height: 1.05;
+    }
+
+    .popup-controls .menu_button {
+        min-width: unset;
+        min-height: 34px;
+        padding: 5px 10px;
+        font-size: calc(var(--mainFontSize) * 0.9);
+    }
+
+    .paginationjs-pages ul li a {
+        padding: 2px 8px;
+    }
 }
 .popup-controls {
     .menu_button {
@@ -3410,6 +3448,10 @@ body:not(.charListGrid).big-avatars {
         h4 {
             margin-top: 0px;
         }
+
+        @media screen and (max-width: 1000px) {
+            padding: 4px 8px;
+        }
     }
 
     @media screen and (max-width: 1000px) {
@@ -4229,6 +4271,118 @@ body.hushstyle {
 #dialogue_popup_cancel:hover {
     background: var(--sb-button-hover, color-mix(in srgb, var(--SmartThemeQuoteColor) 14%, transparent)) !important;
     color: var(--SmartThemeBodyColor) !important;
+}
+
+@media screen and (max-width: 1000px) {
+    :is(#left-nav-panel, #right-nav-panel, #WorldInfo, .drawer-content, #character_popup, .popup) :is(.menu_button, .right_menu_button) {
+        min-height: 34px !important;
+        padding: 4px 8px !important;
+        font-size: calc(var(--mainFontSize) * 0.9) !important;
+        line-height: 1.05 !important;
+    }
+
+    :is(#left-nav-panel, #right-nav-panel, #WorldInfo, .drawer-content, #character_popup, .popup) :is(.menu_button, .right_menu_button, .menu_button_icon):is(.fa, .fa-solid, .fa-regular, .fa-brands):empty,
+    :is(#left-nav-panel, #right-nav-panel, #WorldInfo, .drawer-content, #character_popup, .popup) :is(.menu_button, .right_menu_button, .menu_button_icon):not(:has(> span)):not(:has(> small)):not(:has(> b)):not(:has(> strong)):has(> :is(.fa, .fa-solid, .fa-regular, .fa-brands, i, svg, img):only-child),
+    :is(#left-nav-panel, #right-nav-panel, #WorldInfo, .drawer-content, #character_popup, .popup) :is(.menu_button, .right_menu_button, .menu_button_icon):not(:has(> span)):not(:has(> small)):not(:has(> b)):not(:has(> strong)):has(> input[hidden] + :is(.fa, .fa-solid, .fa-regular, .fa-brands, i, svg, img):last-child) {
+        width: 34px !important;
+        inline-size: 34px !important;
+        min-width: 34px !important;
+        min-inline-size: 34px !important;
+        max-width: 34px !important;
+        max-inline-size: 34px !important;
+        height: 34px !important;
+        block-size: 34px !important;
+        min-height: 34px !important;
+        min-block-size: 34px !important;
+        max-height: 34px !important;
+        max-block-size: 34px !important;
+        flex: 0 0 34px !important;
+        padding: 0 !important;
+    }
+
+    .popup-controls .menu_button,
+    .menu_button.popup-button-ok,
+    .menu_button.menu_button_default,
+    #dialogue_popup_ok,
+    #dialogue_popup_cancel {
+        min-height: 34px !important;
+        padding: 5px 10px !important;
+        font-size: calc(var(--mainFontSize) * 0.9) !important;
+    }
+
+    #rm_button_bar {
+        grid-template-columns: repeat(4, minmax(34px, 1fr)) !important;
+        gap: 4px !important;
+    }
+
+    #rm_button_bar .menu_button,
+    #rm_button_bar .right_menu_button {
+        width: 34px !important;
+        min-width: 34px !important;
+        max-width: 34px !important;
+        height: 34px !important;
+        min-height: 34px !important;
+        max-height: 34px !important;
+        flex: 0 0 34px !important;
+        padding: 0 !important;
+    }
+
+    #character_sort_order {
+        height: 34px !important;
+        min-height: 34px !important;
+        padding-block: 4px !important;
+        font-size: max(16px, calc(var(--mainFontSize) * 0.9)) !important;
+    }
+
+    #rm_button_search {
+        flex: 0 0 34px !important;
+    }
+
+    #form_character_search_form {
+        margin-top: 5px !important;
+    }
+
+    #character_search_bar {
+        min-height: 38px !important;
+        padding: 6px 10px !important;
+        font-size: max(16px, calc(var(--mainFontSize) * 0.95)) !important;
+    }
+
+    #rm_print_characters_pagination {
+        gap: 4px !important;
+        padding: 3px 0 !important;
+    }
+
+    #rm_print_characters_pagination .paginationjs {
+        gap: 4px !important;
+    }
+
+    #rm_print_characters_pagination .paginationjs-pages ul {
+        gap: 4px !important;
+    }
+
+    #rm_print_characters_pagination .menu_button,
+    #rm_print_characters_pagination .paginationjs-pages ul li a {
+        width: 34px !important;
+        min-width: 34px !important;
+        max-width: 34px !important;
+        height: 34px !important;
+        min-height: 34px !important;
+        max-height: 34px !important;
+        padding: 0 !important;
+    }
+
+    #rm_print_characters_pagination .paginationjs-size-changer select {
+        height: 34px !important;
+        min-height: 34px !important;
+        padding: 4px 8px !important;
+        font-size: max(16px, calc(var(--mainFontSize) * 0.9)) !important;
+    }
+
+    #rm_print_characters_pagination .paginationjs-nav {
+        min-height: 34px !important;
+        padding-inline: 4px !important;
+    }
 }
 
 body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipeRightBlock {
