@@ -37,7 +37,7 @@ body {
     --SmartThemeCheckboxTickColor: var(--SmartThemeBlurTintColor);
     --customMesPadding: 1em;
     --customRippleAvatarRatio: 1.5;
-    --moonlit-sb-topbar-offset: var(--sb-topbar-layout-offset, var(--topBarBlockSize));
+    --moonlit-sb-topbar-offset: var(--sb-topbar-primary-height, var(--topBarBlockSize));
 
     /* Secondary Colors 次要顏色 */
     --fullred: rgb(229, 57, 53);
@@ -751,6 +751,36 @@ body.movingUI ::-webkit-scrollbar-thumb:vertical {
     border-bottom: 1.25px solid color-mix(in srgb, var(--SmartThemeBodyColor) 5%, transparent);
     box-sizing: border-box;
     max-height: var(--topBarBlockSize); /* 設置最大高度，防止超出 */
+}
+
+body:has(#sb-topbar-stack) {
+    --sb-topbar-layout-offset: var(--moonlit-sb-topbar-offset);
+}
+
+body:has(#sb-topbar-stack) #top-settings-holder {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    overflow: visible !important;
+    pointer-events: none !important;
+    border-bottom: 0 !important;
+}
+
+body:has(#sb-topbar-stack) #top-settings-holder > .drawer,
+body:has(#sb-topbar-stack) #top-settings-holder > .sb-drawer-host {
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    overflow: visible !important;
+}
+
+body:has(#sb-topbar-stack) #top-settings-holder :is(.drawer-content, .popup),
+body:has(#sb-topbar-stack) #top-settings-holder :is(.drawer-content, .popup) * {
+    pointer-events: auto;
 }
 
 /* --- Basic Menu 基礎內容選單 --- */
