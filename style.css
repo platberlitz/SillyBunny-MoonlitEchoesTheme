@@ -37,6 +37,7 @@ body {
     --SmartThemeCheckboxTickColor: var(--SmartThemeBlurTintColor);
     --customMesPadding: 1em;
     --customRippleAvatarRatio: 1.5;
+    --moonlit-sb-topbar-offset: var(--sb-topbar-layout-offset, var(--topBarBlockSize));
 
     /* Secondary Colors 次要顏色 */
     --fullred: rgb(229, 57, 53);
@@ -727,7 +728,7 @@ body.movingUI ::-webkit-scrollbar-thumb:vertical {
 
 /* Top Bar 上方導航條 */
 #top-bar {
-    height: var(--topBarBlockSize);
+    height: var(--moonlit-sb-topbar-offset);
     background-color: var(--customTopBarColor) !important;
     width:  auto;
     border-radius: 0px !important;
@@ -2172,7 +2173,7 @@ body.ripplestyle #chat {
 }
 body.ripplestyle.no-timer.no-mesIDDisplay.no-tokenCount {
     #chat .mes .mesAvatarWrapper {
-        padding-bottom: 0 !important;
+        padding-bottom: var(--moonlit-sb-ripple-left-bottom-gap) !important;
     }
 }
 body.ripplestyle.big-avatars #chat .mes {
@@ -4007,6 +4008,7 @@ body.hushstyle {
     --moonlit-sb-ripple-avatar-mobile-height: calc(var(--moonlit-sb-ripple-avatar-mobile-width) * var(--customRippleAvatarRatio, 1.5));
     --moonlit-sb-ripple-avatar-mobile-width: var(--customRippleAvatarMobileWidth, 100px);
     --moonlit-sb-ripple-avatar-desktop-width: min(var(--customRippleAvatarWidth, 180px), 35%);
+    --moonlit-sb-ripple-left-bottom-gap: 10px;
     --moonlit-sb-swipe-control-size: 24px;
     --moonlit-sb-swipe-counter-width: 38px;
     --moonlit-sb-swipe-edge-offset: 8px;
@@ -4627,7 +4629,7 @@ input[type="number"].moonlit-neo-range-input,
         min-height: 0 !important;
         min-width: 0 !important;
         overflow: visible !important;
-        padding: 0 !important;
+        padding: 0 0 var(--moonlit-sb-ripple-left-bottom-gap) 0 !important;
         position: sticky !important;
         top: 0 !important;
         z-index: 2;
@@ -4635,7 +4637,7 @@ input[type="number"].moonlit-neo-range-input,
     }
 
     body.ripplestyle #chat .last_mes:not(.smallSysMes) .mesAvatarWrapper {
-        padding-bottom: 0 !important;
+        padding-bottom: var(--moonlit-sb-ripple-left-bottom-gap) !important;
     }
 
     body.ripplestyle #chat .mes:not(.smallSysMes) .mesAvatarWrapper .avatar,
