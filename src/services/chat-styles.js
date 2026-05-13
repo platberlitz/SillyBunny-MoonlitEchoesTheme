@@ -178,10 +178,7 @@ export function applyChatStyle(value, options = {}) {
     const settings = context ? getExtensionSettings(context) : null;
     const select = getChatDisplaySelect();
     const normalized = normalizeChatStyleValue(value, getSavedChatStyle(settings, select));
-    const extensionEnabled = settings?.enabled !== false;
-    const styleValue = extensionEnabled || !isMoonlitChatStyleValue(normalized)
-        ? normalized
-        : getCoreFallbackStyle(select);
+    const styleValue = normalized;
     const className = CHAT_STYLE_CLASSES[styleValue] ?? CHAT_STYLE_CLASSES['0'];
 
     document.body.classList.remove(...ALL_CHAT_STYLE_CLASSES);
@@ -230,16 +227,12 @@ export function setChatStyle(value, options = {}) {
 }
 
 export function syncChatStyleEnabledState(enabled) {
+    void enabled;
     const context = getContextSafe();
     const settings = context ? getExtensionSettings(context) : null;
     const savedStyle = getSavedChatStyle(settings);
 
-    if (enabled || !isMoonlitChatStyleValue(savedStyle)) {
-        applyChatStyle(savedStyle, { context });
-        return;
-    }
-
-    applyChatStyle(getCoreFallbackStyle(), { context });
+    applyChatStyle(savedStyle, { context });
 }
 
 export function initChatStyleIntegration({ t } = {}) {
@@ -296,7 +289,7 @@ export function initChatStyleIntegration({ t } = {}) {
                 const latestSettings = latestContext ? getExtensionSettings(latestContext) : null;
                 const savedStyle = getSavedChatStyle(latestSettings);
 
-                if (!latestSettings || latestSettings.enabled === false || !isMoonlitChatStyleValue(savedStyle)) {
+                if (!latestSettings || !isMoonlitChatStyleValue(savedStyle)) {
                     return;
                 }
 
