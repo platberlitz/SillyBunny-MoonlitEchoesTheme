@@ -4425,6 +4425,56 @@ body.hushstyle {
         min-height: 34px !important;
         padding-inline: 4px !important;
     }
+
+    #form_character_search_form {
+        flex-wrap: wrap !important;
+        min-width: 0 !important;
+    }
+
+    #form_character_search_form > * {
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    #rm_button_create {
+        align-items: center !important;
+        display: inline-flex !important;
+        flex: 0 0 34px !important;
+        font-size: 0 !important;
+        height: 34px !important;
+        justify-content: center !important;
+        max-height: 34px !important;
+        max-width: 34px !important;
+        min-height: 34px !important;
+        min-width: 34px !important;
+        padding: 0 !important;
+        width: 34px !important;
+    }
+
+    #rm_button_create::before,
+    #rm_button_create :is(.fa, .fa-solid, .fa-regular, .fa-brands, i, svg) {
+        font-size: calc(var(--mainFontSize) * 0.95) !important;
+        margin: 0 !important;
+    }
+
+    #character_sort_order {
+        flex: 1 1 120px !important;
+        min-width: 0 !important;
+    }
+
+    #rm_print_characters_block .flex-container {
+        margin-bottom: 8px !important;
+        row-gap: 12px !important;
+    }
+
+    body:not(.charListGrid) #rm_print_characters_block :is(.bogus_folder_select, .character_select, .group_select) {
+        align-items: center !important;
+        min-height: calc(var(--avatar-base-height) + 8px) !important;
+    }
+
+    body:not(.charListGrid) #rm_print_characters_block .character_name_block {
+        padding-block: 4px !important;
+    }
 }
 
 body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipeRightBlock {
