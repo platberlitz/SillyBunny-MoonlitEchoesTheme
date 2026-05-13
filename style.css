@@ -183,6 +183,9 @@ h3 {
 .drawer-content h3 {
     white-space: nowrap;
 }
+.drawer-content .sb-character-editor-empty-copy h3 {
+    white-space: normal;
+}
 h4 {
     letter-spacing: 0.8px;
     margin-top: 10px;
@@ -2646,6 +2649,7 @@ body.ripplestyle {
 .zoomed_avatar {
     backdrop-filter: none !important;
     background-color: transparent !important;
+    z-index: 31 !important;
 }
 
 /* --- Visual Novel Mode 視覺小說模式 --- */
