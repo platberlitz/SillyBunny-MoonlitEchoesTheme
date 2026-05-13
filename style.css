@@ -4436,24 +4436,35 @@ body.hushstyle {
         min-width: 0 !important;
     }
 
-    #rm_button_create {
+    body #right-nav-panel.openDrawer .sb-character-create-bar #rm_button_create {
         align-items: center !important;
+        aspect-ratio: 1 / 1 !important;
+        block-size: 38px !important;
         display: inline-flex !important;
-        flex: 0 0 34px !important;
-        font-size: 0 !important;
-        height: 34px !important;
+        flex: 0 0 38px !important;
+        gap: 0 !important;
+        height: 38px !important;
+        inline-size: 38px !important;
         justify-content: center !important;
-        max-height: 34px !important;
-        max-width: 34px !important;
-        min-height: 34px !important;
-        min-width: 34px !important;
+        max-block-size: 38px !important;
+        max-height: 38px !important;
+        max-inline-size: 38px !important;
+        max-width: 38px !important;
+        min-block-size: 38px !important;
+        min-height: 38px !important;
+        min-inline-size: 38px !important;
+        min-width: 38px !important;
         padding: 0 !important;
-        width: 34px !important;
+        width: 38px !important;
     }
 
-    #rm_button_create::before,
-    #rm_button_create :is(.fa, .fa-solid, .fa-regular, .fa-brands, i, svg) {
-        font-size: calc(var(--mainFontSize) * 0.95) !important;
+    body #right-nav-panel.openDrawer .sb-character-create-bar #rm_button_create::after {
+        content: none !important;
+        display: none !important;
+    }
+
+    body #right-nav-panel.openDrawer .sb-character-create-bar #rm_button_create::before {
+        font-size: calc(var(--mainFontSize) * 1.05) !important;
         margin: 0 !important;
     }
 
@@ -4462,19 +4473,6 @@ body.hushstyle {
         min-width: 0 !important;
     }
 
-    #rm_print_characters_block .flex-container {
-        margin-bottom: 8px !important;
-        row-gap: 12px !important;
-    }
-
-    body:not(.charListGrid) #rm_print_characters_block :is(.bogus_folder_select, .character_select, .group_select) {
-        align-items: center !important;
-        min-height: calc(var(--avatar-base-height) + 8px) !important;
-    }
-
-    body:not(.charListGrid) #rm_print_characters_block .character_name_block {
-        padding-block: 4px !important;
-    }
 }
 
 body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipeRightBlock {
