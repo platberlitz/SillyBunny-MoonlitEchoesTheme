@@ -4473,10 +4473,24 @@ body.hushstyle {
         min-width: 0 !important;
     }
 
+    body #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select) > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar) > :is(.character_select_container, .group_select_container) {
+        align-items: start !important;
+        overflow: visible !important;
+    }
+
+    body #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select) :is(.character_name_block, .group_name_block) {
+        align-items: start !important;
+        overflow: visible !important;
+    }
+
     body #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select) :is(.character_name_block, .group_name_block) :is(.ch_name, .group_select_counter, .bogus_folder_counter) {
-        line-height: 1.3 !important;
-        min-height: 1.3em !important;
-        padding-block: 0.08em !important;
+        display: block !important;
+        line-height: 1.35 !important;
+        min-height: 1.35em !important;
+        overflow: visible !important;
+        padding-block: 0.1em !important;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
     }
 
 }

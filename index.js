@@ -426,8 +426,12 @@ export function toggleCss(shouldLoad) {
         const cssVersion = encodeURIComponent(THEME_VERSION);
 
         // Load theme style
-        if (!existingLinkStyle) {
-            const cssUrl = `${baseUrl}/style.css?v=${cssVersion}`;
+        const cssUrl = `${baseUrl}/style.css?v=${cssVersion}`;
+        if (existingLinkStyle) {
+            if (existingLinkStyle.href !== cssUrl) {
+                existingLinkStyle.href = cssUrl;
+            }
+        } else {
             const linkStyle = document.createElement('link');
             linkStyle.id = 'MoonlitEchosTheme-style';
             linkStyle.rel = 'stylesheet';
@@ -436,8 +440,12 @@ export function toggleCss(shouldLoad) {
         }
 
         // Load extension style
-        if (!existingLinkExt) {
-            const extUrl = `${baseUrl}/extension.css?v=${cssVersion}`;
+        const extUrl = `${baseUrl}/extension.css?v=${cssVersion}`;
+        if (existingLinkExt) {
+            if (existingLinkExt.href !== extUrl) {
+                existingLinkExt.href = extUrl;
+            }
+        } else {
             const linkExt = document.createElement('link');
             linkExt.id = 'MoonlitEchosTheme-extension';
             linkExt.rel = 'stylesheet';
