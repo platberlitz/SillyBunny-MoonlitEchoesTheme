@@ -4473,6 +4473,12 @@ body.hushstyle {
         min-width: 0 !important;
     }
 
+    body #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select) :is(.character_name_block, .group_name_block) :is(.ch_name, .group_select_counter, .bogus_folder_counter) {
+        line-height: 1.3 !important;
+        min-height: 1.3em !important;
+        padding-block: 0.08em !important;
+    }
+
 }
 
 body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .last_mes .swipeRightBlock {
