@@ -850,24 +850,27 @@ body:has(#chatsplus-tab-row) {
 #send_form #gg-action-button-container.gg-action-buttons-container {
     align-items: center;
     box-sizing: border-box;
-    display: flex;
-    gap: 6px;
+    column-gap: 6px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     order: 1;
-    padding: 0 8px 6px;
+    padding: 0 10px 6px;
     width: 100%;
-}
-
-#send_form #gg-action-button-container .stih--buttons,
-#send_form #gg-action-button-container .gg-qr-container {
-    flex: 1 1 auto;
-    min-width: 0;
 }
 
 #send_form #gg-action-button-container .stih--buttons {
     align-items: center;
     display: flex;
+    flex: 0 0 auto;
+    grid-column: 1;
     justify-content: flex-start;
+    min-width: 0;
     position: static;
+}
+
+#send_form #gg-action-button-container .gg-qr-container {
+    grid-column: 2;
+    min-width: 0;
 }
 
 #send_form #gg-action-button-container .stih--arrows,
@@ -880,8 +883,10 @@ body:has(#chatsplus-tab-row) {
 #send_form #gg-action-button-container .gg-regular-buttons-container {
     display: flex;
     flex: 0 0 auto;
+    grid-column: 3;
     justify-content: flex-end;
-    margin-left: auto;
+    justify-self: end;
+    margin-left: 0;
 }
 
 #send_form #gg-action-button-container .gg-action-button {
@@ -956,8 +961,8 @@ body:has(#chatsplus-tab-row) {
     }
 
     #send_form #gg-action-button-container.gg-action-buttons-container {
-        flex-wrap: nowrap;
-        padding-inline: 8px;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        padding-inline: 10px;
     }
 }
 
