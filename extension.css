@@ -963,6 +963,11 @@ body:has(#chatsplus-tab-row) {
     #send_form #gg-action-button-container.gg-action-buttons-container {
         grid-template-columns: auto minmax(0, 1fr) auto;
         padding-inline: 10px;
+        padding-block-end: 2px;
+    }
+
+    #send_form .stih--standalone {
+        padding-block-end: 2px;
     }
 }
 
