@@ -842,6 +842,61 @@ body:has(#chatsplus-tab-row) {
 
 /* Input History 輸入歷史 */
 
+#send_form {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+#send_form #gg-action-button-container.gg-action-buttons-container {
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    gap: 6px;
+    order: 1;
+    padding: 0 8px 6px;
+    width: 100%;
+}
+
+#send_form #gg-action-button-container .stih--buttons,
+#send_form #gg-action-button-container .gg-qr-container {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+#send_form #gg-action-button-container .stih--buttons {
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+    position: static;
+}
+
+#send_form #gg-action-button-container .stih--arrows,
+#send_form .stih--standalone .stih--arrows {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+}
+
+#send_form #gg-action-button-container .gg-regular-buttons-container {
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    margin-left: auto;
+}
+
+#send_form #gg-action-button-container .gg-action-button {
+    flex: 0 0 auto !important;
+}
+
+#send_form .stih--standalone {
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+    order: 1;
+    padding: 0 8px 6px;
+    position: static;
+}
+
 .stih--history {
     font-size: 1em !important;
 }
@@ -893,13 +948,16 @@ body:has(#chatsplus-tab-row) {
 
 @media screen and (max-width: 1000px) {
     .stih--buttons {
-        position: absolute;
-        bottom: 3px;
-        right: 50px;
+        position: static;
     }
     .stih--buttons,
     .stih--buttons > * {
         gap: 5px !important;
+    }
+
+    #send_form #gg-action-button-container.gg-action-buttons-container {
+        flex-wrap: nowrap;
+        padding-inline: 8px;
     }
 }
 

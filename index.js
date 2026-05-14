@@ -416,15 +416,16 @@ return new Promise((resolve) => {
  * @param {boolean} shouldLoad - If true, load CSS, otherwise remove
  */
 export function toggleCss(shouldLoad) {
+    const baseUrl = getBaseUrl();
+    const cssVersion = encodeURIComponent(THEME_VERSION);
+
+    ensureChatStyleCss(baseUrl, cssVersion);
+
     // Get existing <link> elements
     const existingLinkStyle = document.getElementById('MoonlitEchosTheme-style');
     const existingLinkExt = document.getElementById('MoonlitEchosTheme-extension');
 
     if (shouldLoad) {
-        // Determine base URL path
-        const baseUrl = getBaseUrl();
-        const cssVersion = encodeURIComponent(THEME_VERSION);
-
         // Load theme style
         const cssUrl = `${baseUrl}/style.css?v=${cssVersion}`;
         if (existingLinkStyle) {
@@ -472,6 +473,24 @@ export function toggleCss(shouldLoad) {
         clearAllCheckboxStyles();
         syncChatStyleEnabledState(false);
     }
+}
+
+function ensureChatStyleCss(baseUrl, cssVersion) {
+    const cssUrl = `${baseUrl}/chat-styles.css?v=${cssVersion}`;
+    const existingLink = document.getElementById('MoonlitEchosTheme-chat-styles');
+
+    if (existingLink) {
+        if (existingLink.href !== cssUrl) {
+            existingLink.href = cssUrl;
+        }
+        return;
+    }
+
+    const link = document.createElement('link');
+    link.id = 'MoonlitEchosTheme-chat-styles';
+    link.rel = 'stylesheet';
+    link.href = cssUrl;
+    document.head.append(link);
 }
 
 /**
