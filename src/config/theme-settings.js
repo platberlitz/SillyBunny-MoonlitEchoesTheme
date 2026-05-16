@@ -851,95 +851,93 @@ export const themeCustomSettings = [
     {
         "type": "checkbox",
         "varId": "enableMobile-send_form",
-        "displayText": t`Enable New Mobile Input Field`,
-        "default": true,
+        "displayText": t`Enable New Mobile Input Field (Legacy)`,
+        "default": false,
         "category": "mobile-global-settings",
-        "description": t`A message input field designed for mobile, providing a wider input box`,
+        "description": t`Legacy mobile input layout for non-SillyBunny shells. SillyBunny's native composer now handles this layout and sizing.`,
         "cssBlock":  `
             /* Mobile Input Field */
             @media screen and (max-width: 1000px) {
-                #form_sheld {}
+                body:not(:has(.sb-shell-root)):not(:has(#sb-topbar-stack)) {
+                    #form_sheld {}
 
-                body:has([data-slide-toggle="shown"]) #send_form  {
-                    border-radius: 0 !important;
-                }
-
-                /* Mobile Chat Input Overall */
-                #send_form {
-                    margin-bottom: 0 !important;
-                    min-height: 0 !important;
-                    height: auto !important;
-                    padding: 5px 15px;
-                    padding-top: 8px;
-                    border-radius: 15px 15px 0 0 !important;
-                    transition: all 0.5s ease;
-
-                    &:focus-within {
-                        border-top: 1.25px solid var(--customThemeColor) !important;
-                        box-shadow: 0 0 5px var(--customThemeColor);
+                    &:has([data-slide-toggle="shown"]) #send_form  {
+                        border-radius: 0 !important;
                     }
 
-                    &.compact {
-                        #leftSendForm,
-                        #rightSendForm {
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            flex-wrap: nowrap;
-                            width: unset;
+                    /* Mobile Chat Input Overall */
+                    #send_form {
+                        margin-bottom: 0 !important;
+                        min-height: 0 !important;
+                        height: auto !important;
+                        padding: 5px 15px;
+                        padding-top: 8px;
+                        border-radius: 15px 15px 0 0 !important;
+                        transition: all 0.5s ease;
+
+                        &:focus-within {
+                            border-top: 1.25px solid var(--customThemeColor) !important;
+                            box-shadow: 0 0 5px var(--customThemeColor);
+                        }
+
+                        &.compact {
+                            #leftSendForm,
+                            #rightSendForm {
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                flex-wrap: nowrap;
+                                width: unset;
+                            }
                         }
                     }
-                }
 
-                /* Mobile Chat Menu */
-                #nonQRFormItems {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    grid-template-rows: auto auto;
-                    grid-template-areas:
-                    "textarea textarea"
-                    "left right";
-                    gap: 0;
-                    padding: 0;
+                    /* Mobile Chat Menu */
+                    #nonQRFormItems {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        grid-template-rows: auto auto;
+                        grid-template-areas:
+                        "textarea textarea"
+                        "left right";
+                        gap: 0;
+                        padding: 0;
 
-                    #send_textarea {
-                        grid-area: textarea;
-                        box-sizing: border-box;
-                        width: 100%;
-                        padding: 5px 6px;
-                        margin-top: 3px;
+                        #send_textarea {
+                            grid-area: textarea;
+                            box-sizing: border-box;
+                            width: 100%;
+                            padding: 5px 6px;
+                            margin-top: 3px;
+                        }
                     }
-                }
 
-                /* Mobile Left & Right Chat Menu */
-                #leftSendForm,
-                #rightSendForm {
-                    margin: 3px 0;
-                }
-                #leftSendForm {
-                    grid-area: left;
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-start !important;
-                }
-                #rightSendForm {
-                    grid-area: right;
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-end !important;
-                }
+                    /* Mobile Left & Right Chat Menu */
+                    #leftSendForm,
+                    #rightSendForm {
+                        margin: 3px 0;
+                    }
+                    #leftSendForm {
+                        grid-area: left;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start !important;
+                    }
+                    #rightSendForm {
+                        grid-area: right;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end !important;
+                    }
 
-                #rightSendForm > div,
-                #leftSendForm > div,
-                #nonQRFormItems #options_button {
-                    font-size: 16px;
-                }
-                #nonQRFormItems #options_button {
-                    margin-right: 10px;
-                }
-
-                #leftSendForm>div {
-                    width: var(--bottomFormBlockSize) !important;
+                    #rightSendForm > div,
+                    #leftSendForm > div,
+                    #nonQRFormItems #options_button {
+                        font-size: 16px;
+                    }
+                    #nonQRFormItems #options_button {
+                        margin-right: 10px;
+                    }
                 }
             }
     `

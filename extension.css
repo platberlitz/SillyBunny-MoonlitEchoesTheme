@@ -842,7 +842,7 @@ body:has(#chatsplus-tab-row) {
 
 /* Input History 輸入歷史 */
 
-#send_form {
+#send_form:has(#gg-action-button-container, .stih--standalone) {
     display: flex;
     flex-direction: column-reverse;
 }

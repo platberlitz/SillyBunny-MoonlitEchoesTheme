@@ -2889,8 +2889,10 @@ body.bubblechat {
     --sb-mobile-overlay-bg: color-mix(in srgb, var(--SmartThemeBlurTintColor) 96%, transparent);
     --moonlit-sb-avatar-column-width: max(var(--custom-ChatAvatar, 40px), 56px);
     --moonlit-sb-composer-button-radius: var(--sb-icon-control-radius, 10px);
-    --moonlit-sb-composer-button-size: var(--bottomFormBlockSize, 42px);
-    --moonlit-sb-composer-icon-size: calc(var(--bottomFormIconSize, 24px) * 0.72);
+    --moonlit-sb-composer-button-size: var(--sb-composer-action-size, var(--bottomFormBlockSize, 36px));
+    --moonlit-sb-composer-send-ratio: 1.45;
+    --moonlit-sb-composer-send-width: var(--sb-composer-send-width, calc(var(--moonlit-sb-composer-button-size) * var(--moonlit-sb-composer-send-ratio)));
+    --moonlit-sb-composer-icon-size: var(--sb-composer-action-icon-size, calc(var(--bottomFormIconSize, 24px) * 0.72));
     --moonlit-sb-send-icon-idle-color: color-mix(
         in srgb,
         var(--sb-on-solid-accent, var(--sb-on-accent, var(--color-background, var(--SmartThemeBlurTintColor)))) 74%,
@@ -2906,6 +2908,10 @@ body.bubblechat {
     --moonlit-sb-swipe-edge-offset: 8px;
     --moonlit-sb-swipe-gap: 4px;
     --moonlit-sb-swipe-inline-offset: 24px;
+}
+
+:root[data-sb-compact-mode='true'] {
+    --moonlit-sb-composer-send-ratio: 1.42;
 }
 
 #top-bar {
@@ -2994,8 +3000,10 @@ body.bubblechat {
     text-shadow: none !important;
 }
 
-#send_form {
-    margin-bottom: var(--sb-chat-composer-gap, 5px) !important;
+@media screen and (min-width: 1001px) {
+    #send_form {
+        margin-bottom: var(--sb-chat-composer-gap, 5px) !important;
+    }
 }
 
 #send_form #nonQRFormItems {
@@ -3011,12 +3019,9 @@ body.bubblechat {
 
 #send_form #leftSendForm > div:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
 #send_form #rightSendForm > div:not(#send_but):not(#mes_continue):not(#mes_impersonate):not(.stscript_btn):not(.mes_stop):not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
-#send_form:not(.sb-generating-controls) #rightSendForm > #send_but:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
-#send_form.sb-generating-controls .mes_stop,
 #send_form #options_button {
     align-items: center !important;
-    aspect-ratio: 1 / 1;
-    border-radius: var(--moonlit-sb-composer-button-radius) !important;
+    border-radius: var(--sb-radius-button, 14px) !important;
     box-sizing: border-box !important;
     display: inline-flex !important;
     flex: 0 0 var(--moonlit-sb-composer-button-size) !important;
@@ -3034,6 +3039,29 @@ body.bubblechat {
     text-shadow: none !important;
     transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, opacity 180ms ease !important;
     width: var(--moonlit-sb-composer-button-size) !important;
+}
+
+#send_form:not(.sb-generating-controls) #rightSendForm > #send_but:not(.displayNone):not([hidden]):not([style*="display: none"]):not([style*="display:none"]),
+#send_form.sb-generating-controls .mes_stop {
+    align-items: center !important;
+    border-radius: var(--sb-radius-button, 14px) !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    flex: 0 0 var(--moonlit-sb-composer-send-width) !important;
+    font-size: var(--moonlit-sb-composer-icon-size) !important;
+    height: var(--moonlit-sb-composer-button-size) !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    max-height: var(--moonlit-sb-composer-button-size) !important;
+    max-width: var(--moonlit-sb-composer-send-width) !important;
+    min-height: var(--moonlit-sb-composer-button-size) !important;
+    min-width: var(--moonlit-sb-composer-send-width) !important;
+    padding: 0 !important;
+    text-align: center !important;
+    text-shadow: none !important;
+    transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease, opacity 180ms ease !important;
+    width: var(--moonlit-sb-composer-send-width) !important;
 }
 
 #send_form:not(.sb-generating-controls) .mes_stop {
@@ -3068,7 +3096,7 @@ body.bubblechat {
 #send_form :is(
     #leftSendForm > div,
     #rightSendForm > div:not(.stscript_btn),
-    #send_form .mes_stop,
+    .mes_stop,
     #options_button
 ) > :is(i, svg),
 #send_form :is(#send_but, #options_button)::before {
