@@ -844,7 +844,7 @@ body:has(#chatsplus-tab-row) {
 
 #send_form:has(#gg-action-button-container, .stih--standalone) {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
 }
 
 #send_form #gg-action-button-container.gg-action-buttons-container {

@@ -3008,6 +3008,19 @@ body.bubblechat {
 
 #send_form #nonQRFormItems {
     align-items: center !important;
+    --moonlit-sb-composer-left-rail-width: calc(var(--moonlit-sb-composer-button-size) * 2 + 8px);
+    --moonlit-sb-composer-right-rail-width: calc(var(--moonlit-sb-composer-button-size) + var(--moonlit-sb-composer-send-width) + 8px);
+    grid-template-columns:
+        minmax(
+            var(--moonlit-sb-composer-left-rail-width),
+            var(--sb-composer-side-rail-width, var(--moonlit-sb-composer-left-rail-width))
+        )
+        minmax(0, 1fr)
+        minmax(
+            var(--moonlit-sb-composer-right-rail-width),
+            var(--sb-composer-side-rail-width, var(--moonlit-sb-composer-right-rail-width))
+        ) !important;
+    grid-template-areas: 'tools input action' !important;
 }
 
 #send_form #leftSendForm,
