@@ -144,6 +144,7 @@ body.echostyle #chat {
                     background: var(--mes-avatar-original-url, var(--mes-avatar-url)) center no-repeat;
                     background-size: cover;
                     background-attachment: fixed;
+                    opacity: var(--customCSS-bg-opacity, 1);
                     -webkit-mask-image:
                     linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,1) 0%),
                     linear-gradient(to left, rgba(0,0,0,0), rgba(0,0,0,1) 30%),
@@ -196,6 +197,7 @@ body.echostyle #chat {
                     background: var(--mes-avatar-original-url, var(--mes-avatar-url)) center no-repeat;
                     background-size: cover;
                     background-attachment: fixed;
+                    opacity: var(--customCSS-bg-opacity, 1);
                     -webkit-mask-image:
                     linear-gradient(to left, rgba(0,0,0,0), rgba(0,0,0,1) 0%),
                     linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,1) 30%),
@@ -338,7 +340,7 @@ body.whisperstyle #chat {
             -webkit-mask-repeat: no-repeat;
             z-index: 0;
             border-radius: 0 15px 0 0 !important;
-            opacity: 0.8;
+            opacity: calc(var(--customCSS-bg-opacity, 1) * 0.8);
         }
         &.last_mes::before {
             filter: none;
@@ -699,6 +701,7 @@ body.ripplestyle #chat {
                     min-height: calc(var(--customRippleAvatarWidth) * var(--customRippleAvatarRatio));
                     border: 0 !important;
                     border-radius: 15px 0 0 0 !important;
+                    opacity: var(--customCSS-bg-opacity, 1);
                     -webkit-mask-image:
                         linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,1) 0%),
                         linear-gradient(to left, rgba(0,0,0,0), rgba(0,0,0,1) 30%),
