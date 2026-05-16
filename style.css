@@ -2787,6 +2787,11 @@ body.bubblechat #chat .swipe_left {
     right: calc((var(--customMesPadding) * 2) + 95px) !important;
     bottom: 10px;
 }
+body.flatchat #chat .swipeRightBlock,
+body.bubblechat #chat .swipeRightBlock,
+body.documentstyle #chat .swipeRightBlock {
+    right: 15px !important;
+}
 body.documentstyle #chat .swipe_left {
     left: unset !important;
     right: calc(var(--customMesPadding) + 100px) !important;
