@@ -3261,7 +3261,7 @@ body.bubblechat {
     }
 
     #rm_button_bar {
-        grid-template-columns: repeat(4, minmax(34px, 1fr)) !important;
+        grid-template-columns: repeat(2, minmax(34px, 1fr)) !important;
         gap: 4px !important;
     }
 
