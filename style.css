@@ -731,7 +731,6 @@ body.movingUI ::-webkit-scrollbar-thumb:vertical {
 
 /* Top Bar 上方導航條 */
 #top-bar {
-    height: var(--moonlit-sb-topbar-offset);
     background-color: var(--customTopBarColor) !important;
     width:  auto;
     border-radius: 0px !important;
