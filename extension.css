@@ -293,6 +293,20 @@ body.waifuMode {
     }
 }
 
+/* --- Connection Manager action buttons 連線設定檔動作按鈕 --- */
+@media screen and (max-width: 1000px) {
+    .connection-profile-actions > .menu_button {
+        width: var(--connection-profile-action-size) !important;
+        min-width: var(--connection-profile-action-size) !important;
+        max-width: var(--connection-profile-action-size) !important;
+        height: var(--connection-profile-action-size) !important;
+        min-height: var(--connection-profile-action-size) !important;
+        max-height: var(--connection-profile-action-size) !important;
+        flex: 0 0 var(--connection-profile-action-size) !important;
+        padding: 0 !important;
+    }
+}
+
 /* --- Dialogue Colorizer 對話顏色 --- */
 
 .dc-color-picker-wrapper {
