@@ -10,6 +10,24 @@ const SETTINGS_STYLES_URL = new URL('./settings-factory.css', import.meta.url).h
 let applyThemeSettingFn = () => {};
 let applyRawCustomCssFn = () => {};
 
+/**
+ * Persist the current live settings, syncing every themeCustomSettings value
+ * into the active preset so changes survive reloads (applyActivePreset reads
+ * from presets on boot). Falls back to a plain debounced save when no preset
+ * is available.
+ */
+function syncAndSaveSettings(settings, context) {
+    if (settings && settings.presets && settings.activePreset && settings.presets[settings.activePreset]) {
+        const activePreset = settings.presets[settings.activePreset];
+        themeCustomSettings.forEach(({ varId }) => {
+            if (settings[varId] !== undefined) {
+                activePreset[varId] = settings[varId];
+            }
+        });
+    }
+    saveExtensionSettings(context);
+}
+
 export function configureSettingsFactory(options = {}) {
     applyThemeSettingFn = options.applyThemeSetting || (() => {});
     applyRawCustomCssFn = options.applyRawCustomCss || (() => {});
@@ -266,7 +284,7 @@ function createColorPicker(container, setting, settings) {
                         updateSliderThumbColor(hexColor);
                         settings[varId] = rgbaColor;
                         applyThemeSettingFn(varId, rgbaColor);
-                        saveExtensionSettings(context);
+                        syncAndSaveSettings(settings, context);
                     }
                 }
             } catch {
@@ -291,7 +309,7 @@ function createColorPicker(container, setting, settings) {
                         updateSliderThumbColor(hexColor);
                         settings[varId] = rgbaColor;
                         applyThemeSettingFn(varId, rgbaColor);
-                        saveExtensionSettings(context);
+                        syncAndSaveSettings(settings, context);
                     }
                 } else {
                     const previousHex = rgbaToHex(settings[varId]);
@@ -376,7 +394,7 @@ function createColorPicker(container, setting, settings) {
 
         settings[varId] = rgbaColor;
         applyThemeSettingFn(varId, rgbaColor);
-        saveExtensionSettings(context);
+        syncAndSaveSettings(settings, context);
 
         document.dispatchEvent(new CustomEvent('colorChanged', {
             detail: { varId, value: rgbaColor, hexColor }
@@ -398,7 +416,7 @@ function createColorPicker(container, setting, settings) {
 
         settings[varId] = rgbaColor;
         applyThemeSettingFn(varId, rgbaColor);
-        saveExtensionSettings(context);
+        syncAndSaveSettings(settings, context);
     }
 
     alphaRow.appendChild(alphaSlider);
@@ -453,14 +471,14 @@ function createSlider(container, setting, settings) {
         numberInput.value = slider.value;
         settings[varId] = slider.value;
         applyThemeSettingFn(varId, slider.value);
-        saveExtensionSettings(context);
+        syncAndSaveSettings(settings, context);
     });
 
     numberInput.addEventListener('change', () => {
         slider.value = numberInput.value;
         settings[varId] = numberInput.value;
         applyThemeSettingFn(varId, numberInput.value);
-        saveExtensionSettings(context);
+        syncAndSaveSettings(settings, context);
     });
 
     sliderContainer.appendChild(slider);
@@ -487,7 +505,7 @@ function createSelect(container, setting, settings) {
     select.addEventListener('change', () => {
         settings[varId] = select.value;
         applyThemeSettingFn(varId, select.value);
-        saveExtensionSettings(context);
+        syncAndSaveSettings(settings, context);
     });
 
     container.appendChild(select);
@@ -506,7 +524,7 @@ function createTextInput(container, setting, settings) {
     input.addEventListener('change', () => {
         settings[varId] = input.value;
         applyThemeSettingFn(varId, input.value);
-        saveExtensionSettings(context);
+        syncAndSaveSettings(settings, context);
     });
 
     container.appendChild(input);
@@ -528,7 +546,7 @@ function createTextareaInput(container, setting, settings) {
         if (varId === 'rawCustomCss') {
             applyRawCustomCssFn(settings[varId]);
         }
-        saveExtensionSettings(context);
+        syncAndSaveSettings(settings, context);
     };
 
     textarea.addEventListener('change', apply);
@@ -617,7 +635,7 @@ function createCheckbox(container, setting, settings) {
         settings[varId] = checkbox.checked;
         void applyCss(checkbox.checked);
         applyThemeSettingFn(varId, checkbox.checked ? 'true' : 'false');
-        saveExtensionSettings(context);
+        syncAndSaveSettings(settings, context);
     });
 
     checkboxRow.appendChild(label);

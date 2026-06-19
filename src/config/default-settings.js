@@ -47,6 +47,22 @@ export function ensureSettingsStructure(settings) {
         });
     }
 
+    // Backfill any newly added settings into every existing preset so older
+    // presets stay in sync with the current setting catalogue. Prefer the
+    // live top-level value when present, otherwise fall back to the default.
+    Object.keys(settings.presets).forEach((presetName) => {
+        const preset = settings.presets[presetName];
+        if (!preset || typeof preset !== 'object') {
+            return;
+        }
+        themeCustomSettings.forEach((setting) => {
+            const { varId } = setting;
+            if (preset[varId] === undefined) {
+                preset[varId] = settings[varId] !== undefined ? settings[varId] : setting.default;
+            }
+        });
+    });
+
     if (!settings.activePreset || !settings.presets[settings.activePreset]) {
         const firstPreset = Object.keys(settings.presets)[0] || "Moonlit Echoes - by Rivelle";
         settings.activePreset = firstPreset;
