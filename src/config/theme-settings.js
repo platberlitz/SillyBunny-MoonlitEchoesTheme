@@ -1038,6 +1038,33 @@ export const themeCustomSettings = [
     },
     {
         "type": "checkbox",
+        "varId": "enableMobile-horizontal_qrs",
+        "displayText": t`Enable Horizontal QR Scroll on Mobile`,
+        "default": false,
+        "category": "mobile-detailed-settings",
+        "description": t`Keep Quick Reply buttons on a single horizontal row on mobile (screen width ≤ 1000px) with horizontal scrolling, instead of wrapping into multiple lines`,
+        "cssBlock": `
+            @media screen and (max-width: 1000px) {
+                #qr--bar {
+                    max-height: unset !important;
+                    overflow: hidden !important;
+                }
+                #qr--bar > .qr--buttons {
+                    flex-wrap: nowrap !important;
+                    overflow-x: auto !important;
+                    overflow-y: hidden !important;
+                    width: max-content !important;
+                    max-width: 100% !important;
+
+                    *:focus {
+                        outline: none;
+                    }
+                }
+            }
+        `
+    },
+    {
+        "type": "checkbox",
         "varId": "moveQRsBelowInputMobile",
         "displayText": t`Move QRs Bar Below Input on Mobile`,
         "default": true,
