@@ -1046,11 +1046,14 @@ export const themeCustomSettings = [
         "cssBlock": `
             @media screen and (max-width: 1000px) {
                 #qr--bar {
+                    justify-content: center !important;
                     max-height: unset !important;
                     overflow: hidden !important;
                 }
                 #qr--bar > .qr--buttons {
                     flex-wrap: nowrap !important;
+                    justify-content: flex-start !important;
+                    margin-inline: auto !important;
                     overflow-x: auto !important;
                     overflow-y: hidden !important;
                     width: max-content !important;
