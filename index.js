@@ -34,7 +34,10 @@ import {
     updateSelectUI,
     addModernCompactStyles,
 } from './src/ui/settings-factory.js';
-import { applyAllThemeSettings as applyAllThemeSettingsCore } from './src/core/theme-applier.js';
+import {
+    applyAllThemeSettings as applyAllThemeSettingsCore,
+    shouldApplyThemeSetting,
+} from './src/core/theme-applier.js';
 import { initAvatarInjector } from './src/core/observers.js';
 import { addThemeButtonsHint } from './src/services/hints.js';
 import { integrateWithThemeSelector } from './src/services/theme-selector.js';
@@ -828,8 +831,12 @@ function initChatDisplaySwitcher() {
 * @param {string} value - Setting value
 */
 export function applyThemeSetting(varId, value) {
-    // Directly set CSS variable
-    document.documentElement.style.setProperty(`--${varId}`, value, 'important');
+    if (shouldApplyThemeSetting(varId, value)) {
+        document.documentElement.style.setProperty(`--${varId}`, value, 'important');
+    } else {
+        document.documentElement.style.removeProperty(`--${varId}`);
+        applyAllThemeSettings();
+    }
 
     // Trigger custom event
     document.dispatchEvent(new CustomEvent('themeSettingChanged', {

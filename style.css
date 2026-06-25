@@ -35,7 +35,10 @@ body {
     --customThemeMenuColor: var(--SmartThemeChatTintColor);
     --active: var(--customThemeColor);
     --SmartThemeCheckboxTickColor: var(--SmartThemeBlurTintColor);
-    --customMesPadding: 1em;
+    --customMesPadding: calc(1em * var(--messageMarginScale, 1));
+    --moonlit-sb-message-line-height-desktop: calc(var(--mainFontSize) + var(--lineSpacingDesktopLeading, .5rem));
+    --moonlit-sb-message-line-height-mobile: calc(var(--mainFontSize) + var(--lineSpacingMobileLeading, .35rem));
+    --moonlit-sb-message-gap-10: calc(10px * var(--messageMarginScale, 1));
     --customRippleAvatarRatio: 1.5;
     --moonlit-sb-topbar-offset: var(--sb-topbar-primary-height, var(--topBarBlockSize));
 
@@ -1277,7 +1280,7 @@ body.hideChatAvatars #chat {
         .mes_timer,
         .mesIDDisplay,
         .tokenCounterDisplay {
-            margin-left: 10px;
+            margin-left: var(--moonlit-sb-message-gap-10);
             transform: translateY(-18px);
         }
     }
@@ -1414,7 +1417,7 @@ body.documentstyle {
             }
 
             .ch_name {
-                margin-left: 10px;
+                margin-left: var(--moonlit-sb-message-gap-10);
             }
         }
 
@@ -2870,10 +2873,16 @@ body.bubblechat {
 
 #chat .mes_text p {
     letter-spacing: var(--messageTextLetterSpacing, 0em) !important;
-    line-height: var(--messageLineHeight, 1.55em) !important;
+    line-height: var(--messageLineHeight, var(--moonlit-sb-message-line-height-desktop)) !important;
     font-size: var(--messageTextFontSize, var(--mainFontSize)) !important;
     margin-top: var(--mesParagraphSpacingTop, 0.5em) !important;
     margin-bottom: var(--mesParagraphSpacingBottom, 0.5em) !important;
+}
+
+@media screen and (max-width: 1000px) {
+    #chat .mes_text p {
+        line-height: var(--messageLineHeight, var(--moonlit-sb-message-line-height-mobile)) !important;
+    }
 }
 
 #ReverseProxyWarningMessage {
@@ -2911,7 +2920,7 @@ body.bubblechat {
     --moonlit-sb-swipe-counter-width: 38px;
     --moonlit-sb-swipe-edge-offset: 8px;
     --moonlit-sb-swipe-gap: 4px;
-    --moonlit-sb-swipe-inline-offset: 24px;
+    --moonlit-sb-swipe-inline-offset: calc(24px * var(--messageMarginScale, 1));
 }
 
 :root[data-sb-compact-mode='true'] {

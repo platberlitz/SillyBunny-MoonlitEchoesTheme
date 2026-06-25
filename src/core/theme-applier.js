@@ -1,3 +1,9 @@
+import { isNativeMessageLineHeightValue } from '../config/theme-settings.js';
+
+export function shouldApplyThemeSetting(varId, value) {
+    return varId !== 'messageLineHeight' || !isNativeMessageLineHeightValue(value);
+}
+
 /**
  * Apply all theme settings by writing computed CSS variables to the document root.
  * @param {string} settingsKey - Extension settings key.
@@ -24,7 +30,7 @@ export function applyAllThemeSettings(settingsKey, themeCustomSettings, contextO
 
     let cssVars = ':root {\n';
     themeCustomSettings.forEach(({ varId }) => {
-        if (varId && settings[varId] !== undefined) {
+        if (varId && settings[varId] !== undefined && shouldApplyThemeSetting(varId, settings[varId])) {
             cssVars += `  --${varId}: ${settings[varId]} !important;\n`;
         }
     });

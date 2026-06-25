@@ -1,5 +1,23 @@
 import { t } from '../../../../../i18n.js';
 
+export const MESSAGE_LINE_HEIGHT_NATIVE_VALUE = '';
+
+const NATIVE_MESSAGE_LINE_HEIGHT_VALUES = new Set([
+    '',
+    'calc(var(--mainfontsize)+.5rem)',
+    'calc(var(--mainfontsize)+0.5rem)',
+    'calc(var(--mainfontsize)+var(--linespacingdesktopleading,.5rem))',
+    'calc(var(--mainfontsize)+var(--linespacingdesktopleading,0.5rem))',
+]);
+
+function normalizeCssValue(value) {
+    return String(value ?? '').replace(/\s+/g, '').toLowerCase();
+}
+
+export function isNativeMessageLineHeightValue(value) {
+    return NATIVE_MESSAGE_LINE_HEIGHT_VALUES.has(normalizeCssValue(value));
+}
+
 /**
  * Define which categories go into which tab
  * Reorganized for better user experience
@@ -166,9 +184,9 @@ export const themeCustomSettings = [
         "type": "text",
         "varId": "messageLineHeight",
         "displayText": t`Message Text Line Height`,
-        "default": "calc(var(--mainFontSize) + .5rem)",
+        "default": MESSAGE_LINE_HEIGHT_NATIVE_VALUE,
         "category": "chat-style",
-        "description": t`Line height for message body text (e.g. 1.55em, 1.6em)`
+        "description": t`Optional fallback line height. Leave blank to use SillyBunny's native Line Spacing slider`
     },
     {
         "type": "text",

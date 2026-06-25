@@ -4,7 +4,22 @@
     --custom-chat-avatar-size: var(--custom-ChatAvatar, 40px);
     --custom-chat-avatar-frame-size: calc(var(--custom-chat-avatar-size) + 8px);
     --custom-echo-avatar: var(--custom-chat-avatar-frame-size);
-    --customMesPadding: 1em;
+    --customMesPadding: calc(1em * var(--messageMarginScale, 1));
+    --moonlit-sb-message-margin-scale: var(--messageMarginScale, 1);
+    --moonlit-sb-message-gap-4: calc(4px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-6: calc(6px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-8: calc(8px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-10: calc(10px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-11: calc(11px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-12: calc(12px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-13: calc(13px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-14: calc(14px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-16: calc(16px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-18: calc(18px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-20: calc(20px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-gap-24: calc(24px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-padding-inline: calc(1em * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-hush-padding-inline: calc(1.2em * var(--moonlit-sb-message-margin-scale));
     --customRippleAvatarRatio: 1.5;
     --moonlit-sb-avatar-column-width: max(var(--custom-ChatAvatar, 40px), 56px);
     --moonlit-sb-ripple-avatar-mobile-height: calc(var(--moonlit-sb-ripple-avatar-mobile-width) * var(--customRippleAvatarRatio, 1.5));
@@ -15,7 +30,7 @@
     --moonlit-sb-swipe-counter-width: 38px;
     --moonlit-sb-swipe-edge-offset: 8px;
     --moonlit-sb-swipe-gap: 4px;
-    --moonlit-sb-swipe-inline-offset: 24px;
+    --moonlit-sb-swipe-inline-offset: var(--moonlit-sb-message-gap-24);
 }
 
 /* These styles require 10px margin-left for the name */
@@ -24,7 +39,7 @@ body.hideChatAvatars.whisperstyle #chat,
 body.hideChatAvatars.hushstyle #chat,
 body.hideChatAvatars.tidestyle #chat {
     .ch_name {
-        margin-left: 10px;
+        margin-left: var(--moonlit-sb-message-gap-10);
     }
 }
 
@@ -114,9 +129,9 @@ body.echostyle #chat {
                 flex-direction: row-reverse;
                 float: right;
                 clear: both;
-                margin-right: calc(var(--custom-echo-avatar) + 5px + 8px);
+                margin-right: calc(var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-13));
                 margin-left: 0;
-                width: calc(100% - (var(--custom-echo-avatar) + 5px + 8px));
+                width: calc(100% - (var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-13)));
 
                 .flex-container {
                     flex-direction: row-reverse;
@@ -173,11 +188,11 @@ body.echostyle #chat {
 
             .mes_text,
             .last_mes .mes_text {
-                padding: 10px 20px 10px var(--custom-EchoAvatarWidth, 25%) !important;
+                padding: 10px var(--moonlit-sb-message-gap-20) 10px var(--custom-EchoAvatarWidth, 25%) !important;
                 background-color: var(--SmartThemeUserMesBlurTintColor);
 
                 @media screen and (max-width: 1000px) {
-                    padding: 10px 20px 10px var(--custom-EchoAvatarMobileWidth, 25%) !important;
+                    padding: 10px var(--moonlit-sb-message-gap-20) 10px var(--custom-EchoAvatarMobileWidth, 25%) !important;
                 }
             }
         }
@@ -221,10 +236,10 @@ body.echostyle #chat {
             }
             .mes_text,
             .last_mes .mes_text {
-                padding: 10px var(--custom-EchoAvatarWidth, 25%) 10px 20px !important;
+                padding: 10px var(--custom-EchoAvatarWidth, 25%) 10px var(--moonlit-sb-message-gap-20) !important;
 
                 @media screen and (max-width: 1000px) {
-                    padding: 10px var(--custom-EchoAvatarMobileWidth, 25%) 10px 20px !important;
+                    padding: 10px var(--custom-EchoAvatarMobileWidth, 25%) 10px var(--moonlit-sb-message-gap-20) !important;
                 }
             }
         }
@@ -233,7 +248,7 @@ body.echostyle #chat {
     .mesAvatarWrapper {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--moonlit-sb-message-gap-8);
         flex-wrap: wrap;
         min-height: 45px;
         padding-top: 5px;
@@ -252,7 +267,7 @@ body.echostyle #chat {
     }
 
     .mes_reasoning_summary {
-        left: calc(var(--custom-echo-avatar) + 5px + 8px);
+        left: calc(var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-13));
     }
     .mes_reasoning_header > .icon-svg {
         display: block;
@@ -319,7 +334,7 @@ body.whisperstyle #chat {
         width: 100%;
         color: var(--SmartThemeBodyColor);
         position: relative;
-        padding: 1em;
+        padding: 1em var(--moonlit-sb-message-padding-inline);
         padding-top: 45px !important;
         border-radius: 15px;
 
@@ -435,7 +450,7 @@ body.whisperstyle #chat {
     .mesAvatarWrapper {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--moonlit-sb-message-gap-8);
         flex-wrap: wrap;
         min-height: 45px;
     }
@@ -452,7 +467,7 @@ body.whisperstyle #chat {
         margin-right: 5px;
     }
     .mes_reasoning_summary {
-        left: calc(var(--custom-echo-avatar) + 5px + 8px);
+        left: calc(var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-13));
 
     }
 
@@ -513,7 +528,7 @@ body.hushstyle #chat {
         width: 100%;
         color: var(--SmartThemeBodyColor);
         position: relative;
-        padding: 1.3em 1.2em;
+        padding: 1.3em var(--moonlit-sb-hush-padding-inline);
         border-radius: 15px;
 
         &.last_mes::before {
@@ -597,7 +612,7 @@ body.hushstyle #chat {
     .mesAvatarWrapper {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--moonlit-sb-message-gap-8);
         flex-wrap: wrap;
         min-height: 45px;
     }
@@ -614,7 +629,7 @@ body.hushstyle #chat {
         margin-right: 5px;
     }
     .mes_reasoning_summary {
-        left: calc(var(--custom-echo-avatar) + 5px + 8px);
+        left: calc(var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-13));
 
     }
 
@@ -724,8 +739,8 @@ body.ripplestyle #chat {
             box-shadow: none !important;
             box-sizing: border-box;
             padding-top: 20px;
-            padding-left: 12px;
-            padding-right: 24px;
+            padding-left: var(--moonlit-sb-message-gap-12);
+            padding-right: var(--moonlit-sb-message-gap-24);
 
             .ch_name::after {
                 content: "";
@@ -886,7 +901,7 @@ body.tidestyle #chat {
                 margin: 0;
                 margin-bottom: 8px !important;
                 background: var(--SmartThemeBotMesBlurTintColor);
-                padding: 6px 14px !important;
+                padding: 6px var(--moonlit-sb-message-gap-14) !important;
                 border-radius: 18px;
             }
 
@@ -917,9 +932,9 @@ body.tidestyle #chat {
                 flex-direction: row-reverse;
                 float: right;
                 clear: both;
-                margin-right: calc(var(--custom-echo-avatar) + 5px + 8px);
+                margin-right: calc(var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-13));
                 margin-left: 0;
-                width: calc(100% - (var(--custom-echo-avatar) + 5px + 8px));
+                width: calc(100% - (var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-13)));
 
                 .flex-container {
                     flex-direction: row-reverse;
@@ -961,7 +976,7 @@ body.tidestyle #chat {
     .mesAvatarWrapper {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--moonlit-sb-message-gap-8);
         flex-wrap: wrap;
         min-height: 45px;
         padding-top: 10px;
@@ -980,7 +995,7 @@ body.tidestyle #chat {
     }
 
     .mes_reasoning_summary {
-        left: calc(var(--custom-echo-avatar) + 5px + 8px);
+        left: calc(var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-13));
 
     }
     .mes_reasoning_header > .icon-svg {
@@ -1143,10 +1158,10 @@ body.hushstyle,
 body.tidestyle {
     #chat .ch_name {
         margin-top: 3px;
-        margin-left: calc(var(--custom-echo-avatar) + 8px);
+        margin-left: calc(var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-8));
 
         @media screen and (max-width: 1000px) {
-            margin-left: calc(var(--custom-echo-avatar) + 11px)
+            margin-left: calc(var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-11))
         }
     }
 }
@@ -1187,7 +1202,7 @@ body.big-avatars.tidestyle:not(.hideChatAvatars) #chat {
         transform: unset !important;
     }
     .ch_name {
-        margin-left: calc(var(--custom-echo-avatar) + 18px);
+        margin-left: calc(var(--custom-echo-avatar) + var(--moonlit-sb-message-gap-18));
         margin-bottom: 10px;
     }
 }
@@ -1271,7 +1286,7 @@ body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .
     body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) .mesAvatarWrapper {
         align-content: flex-start;
         align-items: center;
-        gap: 4px 6px;
+        gap: var(--moonlit-sb-message-gap-4) var(--moonlit-sb-message-gap-6);
         min-height: 0;
         overflow: visible;
         padding-bottom: 0 !important;
@@ -1299,7 +1314,7 @@ body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .
 
     body:is(.echostyle, .whisperstyle, .hushstyle, .tidestyle) #chat .mes:not(.smallSysMes) {
         align-items: start;
-        column-gap: 10px;
+        column-gap: var(--moonlit-sb-message-gap-10);
         display: grid !important;
         grid-template-columns: minmax(0, var(--moonlit-sb-avatar-column-width)) minmax(0, 1fr) !important;
         row-gap: 0;
@@ -1467,7 +1482,7 @@ body:is(.echostyle, .whisperstyle, .hushstyle, .ripplestyle, .tidestyle) #chat .
         grid-row: 1;
         margin: 0 !important;
         min-width: 0;
-        padding: 10px 24px 34px 16px !important;
+        padding: 10px var(--moonlit-sb-message-gap-24) 34px var(--moonlit-sb-message-gap-16) !important;
         width: 100% !important;
     }
 
