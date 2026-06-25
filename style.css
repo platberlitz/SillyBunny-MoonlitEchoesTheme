@@ -36,6 +36,12 @@ body {
     --active: var(--customThemeColor);
     --SmartThemeCheckboxTickColor: var(--SmartThemeBlurTintColor);
     --customMesPadding: 1em;
+    --moonlit-sb-message-margin-scale: var(--messageMarginScale, 1);
+    --moonlit-sb-message-inline-padding: calc(10px * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-style-inline-padding: calc(1em * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-avatar-gap: calc(var(--customMesPadding) / 2 * var(--moonlit-sb-message-margin-scale));
+    --moonlit-sb-message-line-height-desktop: calc(var(--mainFontSize) + var(--lineSpacingDesktopLeading, .5rem));
+    --moonlit-sb-message-line-height-mobile: calc(var(--mainFontSize) + var(--lineSpacingMobileLeading, .35rem));
     --customRippleAvatarRatio: 1.5;
     --moonlit-sb-topbar-offset: var(--sb-topbar-primary-height, var(--topBarBlockSize));
 
@@ -1010,7 +1016,7 @@ body:has(#sb-topbar-stack) #top-settings-holder :is(.drawer-content, .popup) * {
         border: none;
         box-shadow: none !important;
         background-color: unset !important;
-        padding: 10px 0;
+        padding: 10px var(--moonlit-sb-message-inline-padding);
 
         /* General Avatar 一般頭像 */
         .avatar {
@@ -1049,7 +1055,7 @@ body:has(#sb-topbar-stack) #top-settings-holder :is(.drawer-content, .popup) * {
             width: var(--custom-chat-avatar-frame-size);
             min-width: var(--custom-chat-avatar-frame-size);
             padding-right: 0;
-            margin-right: calc(var(--customMesPadding) / 2);
+            margin-right: var(--moonlit-sb-message-avatar-gap);
         }
         .mes_button, .extraMesButtons > div {
             font-size: var(--mainFontSize);
@@ -1277,7 +1283,7 @@ body.hideChatAvatars #chat {
         .mes_timer,
         .mesIDDisplay,
         .tokenCounterDisplay {
-            margin-left: 10px;
+            margin-left: var(--moonlit-sb-message-inline-padding);
             transform: translateY(-18px);
         }
     }
@@ -1309,6 +1315,7 @@ body.bubblechat {
             border-radius: 0;
             margin: unset;
             padding: unset;
+            padding-inline: var(--moonlit-sb-message-inline-padding);
             margin-bottom: 15px;
             padding-top: 1px;
 
@@ -1362,7 +1369,7 @@ body.bubblechat {
 
             .mesAvatarWrapper {
                 margin-right: 0;
-                margin-left: calc(var(--customMesPadding) / 2);
+                margin-left: var(--moonlit-sb-message-avatar-gap);
             }
 
             .mes_block {
@@ -1398,8 +1405,10 @@ body.documentstyle {
     }
 
     #chat {
+        padding-inline: var(--moonlit-sb-message-inline-padding) !important;
+
         @media screen and (max-width: 1000px) {
-            padding: 1em !important;
+            padding: 1em var(--moonlit-sb-message-style-inline-padding) !important;
         }
 
         .mes {
@@ -1414,7 +1423,7 @@ body.documentstyle {
             }
 
             .ch_name {
-                margin-left: 10px;
+                margin-left: var(--moonlit-sb-message-inline-padding);
             }
         }
 
@@ -2870,10 +2879,16 @@ body.bubblechat {
 
 #chat .mes_text p {
     letter-spacing: var(--messageTextLetterSpacing, 0em) !important;
-    line-height: var(--messageLineHeight, 1.55em) !important;
+    line-height: var(--messageLineHeight, var(--moonlit-sb-message-line-height-desktop)) !important;
     font-size: var(--messageTextFontSize, var(--mainFontSize)) !important;
     margin-top: var(--mesParagraphSpacingTop, 0.5em) !important;
     margin-bottom: var(--mesParagraphSpacingBottom, 0.5em) !important;
+}
+
+@media screen and (max-width: 1000px) {
+    #chat .mes_text p {
+        line-height: var(--messageLineHeight, var(--moonlit-sb-message-line-height-mobile)) !important;
+    }
 }
 
 #ReverseProxyWarningMessage {
@@ -2911,7 +2926,7 @@ body.bubblechat {
     --moonlit-sb-swipe-counter-width: 38px;
     --moonlit-sb-swipe-edge-offset: 8px;
     --moonlit-sb-swipe-gap: 4px;
-    --moonlit-sb-swipe-inline-offset: 24px;
+    --moonlit-sb-swipe-inline-offset: calc(24px * var(--moonlit-sb-message-margin-scale));
 }
 
 :root[data-sb-compact-mode='true'] {

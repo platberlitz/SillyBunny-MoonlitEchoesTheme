@@ -1,4 +1,8 @@
-import { themeCustomSettings } from './theme-settings.js';
+import {
+    MESSAGE_LINE_HEIGHT_NATIVE_VALUE,
+    isNativeMessageLineHeightValue,
+    themeCustomSettings,
+} from './theme-settings.js';
 
 /**
  * Generate default settings snapshot used for initial bootstrapping.
@@ -24,6 +28,18 @@ function generateDefaultSettings() {
 }
 
 export const defaultSettings = generateDefaultSettings();
+
+function migrateMessageLineHeightFallback(settings) {
+    if (isNativeMessageLineHeightValue(settings.messageLineHeight)) {
+        settings.messageLineHeight = MESSAGE_LINE_HEIGHT_NATIVE_VALUE;
+    }
+
+    Object.values(settings.presets || {}).forEach((preset) => {
+        if (preset && typeof preset === 'object' && isNativeMessageLineHeightValue(preset.messageLineHeight)) {
+            preset.messageLineHeight = MESSAGE_LINE_HEIGHT_NATIVE_VALUE;
+        }
+    });
+}
 
 /**
  * Ensure the settings structure is up-to-date.
@@ -79,4 +95,6 @@ export function ensureSettingsStructure(settings) {
             settings.activePreset = "Moonlit Echoes - by Rivelle";
         }
     }
+
+    migrateMessageLineHeightFallback(settings);
 }
