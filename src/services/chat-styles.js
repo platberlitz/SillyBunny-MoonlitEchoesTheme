@@ -297,6 +297,10 @@ export function initChatStyleIntegration({ t } = {}) {
             setTimeout(() => {
                 const latestContext = getContextSafe();
                 const latestSettings = latestContext ? getExtensionSettings(latestContext) : null;
+                if (latestSettings?.enabled === false) {
+                    return;
+                }
+
                 const savedStyle = getSavedChatStyle(latestSettings);
 
                 if (!latestSettings || !isMoonlitChatStyleValue(savedStyle)) {
@@ -311,11 +315,16 @@ export function initChatStyleIntegration({ t } = {}) {
         coreStyleListenerInitialized = true;
     }
 
-    const initialStyle = getSavedChatStyle(settings, select);
-    if (settings && settings.chatStyle !== initialStyle) {
-        settings.chatStyle = initialStyle;
+    const savedInitialStyle = getSavedChatStyle(settings, select);
+    const themeEnabled = settings?.enabled !== false;
+    const initialStyle = themeEnabled ? savedInitialStyle : getCoreFallbackStyle(select);
+    if (themeEnabled && settings && settings.chatStyle !== savedInitialStyle) {
+        settings.chatStyle = savedInitialStyle;
         saveExtensionSettings(context);
     }
 
-    applyChatStyle(initialStyle, { context });
+    applyChatStyle(initialStyle, {
+        context,
+        syncSelect: themeEnabled,
+    });
 }
