@@ -227,12 +227,22 @@ export function setChatStyle(value, options = {}) {
 }
 
 export function syncChatStyleEnabledState(enabled) {
-    void enabled;
     const context = getContextSafe();
     const settings = context ? getExtensionSettings(context) : null;
     const savedStyle = getSavedChatStyle(settings);
 
-    applyChatStyle(savedStyle, { context });
+    if (enabled) {
+        applyChatStyle(savedStyle, { context });
+        return;
+    }
+
+    // Moonlit chat styles depend on CSS variables provided by the theme
+    // stylesheets. When the theme is disabled those variables disappear and
+    // the Moonlit styles (blur/transform/calc) render the page unusable.
+    // Fall back to the last core style (Flat/Bubbles/Document) for display,
+    // but keep the dropdown and saved value on the Moonlit style so it can
+    // be restored instantly on re-enable.
+    applyChatStyle(getCoreFallbackStyle(), { context, syncSelect: false });
 }
 
 export function initChatStyleIntegration({ t } = {}) {
