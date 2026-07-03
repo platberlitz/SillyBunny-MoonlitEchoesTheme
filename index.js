@@ -46,6 +46,98 @@ export function applyAllThemeSettings(contextOverride) {
     return applyAllThemeSettingsCore(settingsKey, themeCustomSettings, contextOverride);
 }
 
+const DISABLE_CHAT_SURFACE_RESET_ID = 'moonlit-disable-chat-surface-reset';
+const DISABLE_CHAT_SURFACE_RESET_CLASS = 'moonlit-disable-chat-surface-reset';
+
+
+function removeDisableChatSurfaceReset() {
+    document.documentElement.classList.remove(DISABLE_CHAT_SURFACE_RESET_CLASS);
+    document.getElementById(DISABLE_CHAT_SURFACE_RESET_ID)?.remove();
+}
+
+
+function installDisableChatSurfaceReset() {
+    let resetStyle = document.getElementById(DISABLE_CHAT_SURFACE_RESET_ID);
+    if (!resetStyle) {
+        resetStyle = document.createElement('style');
+        resetStyle.id = DISABLE_CHAT_SURFACE_RESET_ID;
+        document.head.append(resetStyle);
+    }
+
+    resetStyle.textContent = `
+@supports (-webkit-touch-callout: none) {
+    html.${DISABLE_CHAT_SURFACE_RESET_CLASS} #sheld:not([data-sb-conversation-mode="on"]) {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    html.${DISABLE_CHAT_SURFACE_RESET_CLASS} #sheld:not([data-sb-conversation-mode="on"]) #chat {
+        display: flex !important;
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        -webkit-mask: none !important;
+        mask: none !important;
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
+        -webkit-transform: translateZ(0) !important;
+        transform: translateZ(0) !important;
+    }
+
+    html.${DISABLE_CHAT_SURFACE_RESET_CLASS} #sheld:not([data-sb-conversation-mode="on"]) #form_sheld {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        -webkit-mask: none !important;
+        mask: none !important;
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
+    }
+}`;
+
+    document.documentElement.classList.add(DISABLE_CHAT_SURFACE_RESET_CLASS);
+}
+
+
+function refreshChatSurfaceAfterDisable() {
+    installDisableChatSurfaceReset();
+
+    const chat = document.getElementById('chat');
+    const sheld = document.getElementById('sheld');
+    const chatScrollTop = chat instanceof HTMLElement ? chat.scrollTop : null;
+
+    const refresh = () => {
+        if (sheld instanceof HTMLElement) {
+            void sheld.offsetHeight;
+        }
+
+        if (chat instanceof HTMLElement) {
+            void chat.offsetHeight;
+            if (chatScrollTop !== null) {
+                chat.scrollTop = chatScrollTop;
+            }
+        }
+
+        window.dispatchEvent(new Event('resize'));
+        window.dispatchEvent(new CustomEvent('sb-mobile-viewport-reset', {
+            detail: { restoreScroll: true },
+        }));
+    };
+
+    refresh();
+
+    if (typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(refresh);
+    } else {
+        window.setTimeout(refresh, 0);
+    }
+
+    window.setTimeout(refresh, 180);
+    window.setTimeout(refresh, 420);
+}
+
 
 /**
  * Initialize UI elements and events for the extension
@@ -426,8 +518,17 @@ export function toggleCss(shouldLoad) {
     const existingLinkStyle = document.getElementById('MoonlitEchosTheme-style');
     const existingLinkExt = document.getElementById('MoonlitEchosTheme-extension');
     const existingChatStyleLink = document.getElementById('MoonlitEchosTheme-chat-styles');
+    const existingDynamicThemeStyles = document.getElementById('dynamic-theme-styles');
+    const shouldRefreshChatSurface = Boolean(
+        existingLinkStyle
+        || existingLinkExt
+        || existingChatStyleLink
+        || existingDynamicThemeStyles
+        || document.documentElement.classList.contains(DISABLE_CHAT_SURFACE_RESET_CLASS),
+    );
 
     if (shouldLoad) {
+        removeDisableChatSurfaceReset();
         ensureChatStyleCss(baseUrl, cssVersion);
 
         // Load theme style
@@ -478,8 +579,7 @@ export function toggleCss(shouldLoad) {
 
         // Remove dynamic theme variables so base app CSS (e.g.
         // #chat backdrop-filter blur) doesn't use orphaned theme values
-        const dynamicThemeStyles = document.getElementById('dynamic-theme-styles');
-        if (dynamicThemeStyles) dynamicThemeStyles.remove();
+        if (existingDynamicThemeStyles) existingDynamicThemeStyles.remove();
 
         // Remove hint
         const existingHint = document.getElementById('moonlit-theme-buttons-hint');
@@ -487,6 +587,15 @@ export function toggleCss(shouldLoad) {
 
         // Clear all checkbox styles
         clearAllCheckboxStyles();
+
+        if (shouldRefreshChatSurface) {
+            // Mobile Safari can retain a stale masked/composited #chat layer after
+            // Moonlit's stylesheet is detached. Force the base chat surface visible
+            // and ask SillyBunny to recalculate its mobile viewport bounds.
+            refreshChatSurfaceAfterDisable();
+        } else {
+            removeDisableChatSurfaceReset();
+        }
     }
 }
 
