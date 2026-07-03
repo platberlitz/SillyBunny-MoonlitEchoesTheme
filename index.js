@@ -9,7 +9,7 @@ export { THEME_VERSION } from './src/config/theme-info.js';
 
 // Import required functions for drag functionality
 import { dragElement } from '../../../RossAscends-mods.js';
-import { loadMovingUIState } from '../../../power-user.js';
+import { loadMovingUIState, power_user } from '../../../power-user.js';
 import { t } from '../../../i18n.js';
 import { tabMappings, themeCustomSettings } from './src/config/theme-settings.js';
 import { settingsKey, getSettings as getExtensionSettings, saveSettings as saveExtensionSettings } from './src/services/settings-service.js';
@@ -43,11 +43,105 @@ import { addThemeButtonsHint } from './src/services/hints.js';
 import { integrateWithThemeSelector } from './src/services/theme-selector.js';
 
 export function applyAllThemeSettings(contextOverride) {
+    const settings = getMoonlitSettings(contextOverride);
+    if (settings?.enabled === false) {
+        removeDynamicThemeStyles();
+        clearInlineThemeSettings();
+        removeRawCustomCss();
+        return;
+    }
+
     return applyAllThemeSettingsCore(settingsKey, themeCustomSettings, contextOverride);
 }
 
 const DISABLE_CHAT_SURFACE_RESET_ID = 'moonlit-disable-chat-surface-reset';
 const DISABLE_CHAT_SURFACE_RESET_CLASS = 'moonlit-disable-chat-surface-reset';
+const RAW_CUSTOM_CSS_ID = 'moonlit-raw-css';
+
+const NATIVE_THEME_EFFECT_RESTORES = Object.freeze([
+    { varId: 'customCSS-bg-blur', cssVar: '--customCSS-bg-blur', defaultValue: 0, min: 0, max: 10 },
+    { varId: 'customCSS-bg-opacity', cssVar: '--customCSS-bg-opacity', defaultValue: 1, min: 0, max: 1 },
+    {
+        varId: 'sheldBlurStrength',
+        cssVar: '--sheldBlurStrength',
+        linkedCssVars: ['--mobileSheldBlurStrength'],
+        defaultValue: 0,
+        min: 0,
+        max: 10,
+    },
+    { varId: 'sheldBackgroundColor', cssVar: '--sheldBackgroundColor', defaultValue: 'transparent' },
+]);
+
+const NATIVE_THEME_EFFECT_VAR_IDS = new Set(NATIVE_THEME_EFFECT_RESTORES.map(({ varId }) => varId));
+
+
+function getMoonlitSettings(contextOverride) {
+    try {
+        const context = contextOverride || globalThis.SillyTavern?.getContext?.();
+        return context ? getExtensionSettings(context) : null;
+    } catch {
+        return null;
+    }
+}
+
+
+function normalizeNativeThemeEffectValue(property) {
+    const value = power_user?.[property.varId] ?? property.defaultValue;
+    if (typeof property.min === 'number' && typeof property.max === 'number') {
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) {
+            return property.defaultValue;
+        }
+
+        return Math.min(property.max, Math.max(property.min, numericValue));
+    }
+
+    const stringValue = String(value ?? '').trim();
+    return stringValue || property.defaultValue;
+}
+
+
+function restoreNativeThemeEffects() {
+    const rootStyle = document.documentElement.style;
+    for (const property of NATIVE_THEME_EFFECT_RESTORES) {
+        const value = String(normalizeNativeThemeEffectValue(property));
+        rootStyle.setProperty(property.cssVar, value);
+        for (const linkedCssVar of property.linkedCssVars || []) {
+            rootStyle.setProperty(linkedCssVar, value);
+        }
+    }
+}
+
+
+function clearInlineThemeSettings({ restoreNative = true } = {}) {
+    const rootStyle = document.documentElement.style;
+    themeCustomSettings.forEach(({ varId }) => {
+        if (varId) {
+            rootStyle.removeProperty(`--${varId}`);
+        }
+    });
+
+    if (restoreNative) {
+        restoreNativeThemeEffects();
+    }
+}
+
+
+function hasInlineThemeSettings() {
+    return themeCustomSettings.some(({ varId }) => (
+        varId && document.documentElement.style.getPropertyValue(`--${varId}`)
+    ));
+}
+
+
+function removeDynamicThemeStyles() {
+    document.getElementById('dynamic-theme-styles')?.remove();
+}
+
+
+function removeRawCustomCss() {
+    document.getElementById(RAW_CUSTOM_CSS_ID)?.remove();
+}
 
 
 function removeDisableChatSurfaceReset() {
@@ -207,7 +301,11 @@ export function initExtensionUI() {
 
         const context = SillyTavern.getContext();
         const settings = getExtensionSettings(context) || {};
-        applyRawCustomCss(settings.rawCustomCss || '');
+        if (settings.enabled === false) {
+            removeRawCustomCss();
+        } else {
+            applyRawCustomCss(settings.rawCustomCss || '');
+        }
     });
 
 }
@@ -519,11 +617,14 @@ export function toggleCss(shouldLoad) {
     const existingLinkExt = document.getElementById('MoonlitEchosTheme-extension');
     const existingChatStyleLink = document.getElementById('MoonlitEchosTheme-chat-styles');
     const existingDynamicThemeStyles = document.getElementById('dynamic-theme-styles');
+    const existingRawCustomCss = document.getElementById(RAW_CUSTOM_CSS_ID);
     const shouldRefreshChatSurface = Boolean(
         existingLinkStyle
         || existingLinkExt
         || existingChatStyleLink
         || existingDynamicThemeStyles
+        || existingRawCustomCss
+        || hasInlineThemeSettings()
         || document.documentElement.classList.contains(DISABLE_CHAT_SURFACE_RESET_CLASS),
     );
 
@@ -568,6 +669,9 @@ export function toggleCss(shouldLoad) {
         // Re-apply theme CSS variables (may have been removed on disable)
         applyAllThemeSettings();
 
+        const settings = getMoonlitSettings();
+        applyRawCustomCss(settings?.rawCustomCss || '');
+
         syncChatStyleEnabledState(true);
     } else {
         syncChatStyleEnabledState(false);
@@ -580,6 +684,8 @@ export function toggleCss(shouldLoad) {
         // Remove dynamic theme variables so base app CSS (e.g.
         // #chat backdrop-filter blur) doesn't use orphaned theme values
         if (existingDynamicThemeStyles) existingDynamicThemeStyles.remove();
+        clearInlineThemeSettings();
+        removeRawCustomCss();
 
         // Remove hint
         const existingHint = document.getElementById('moonlit-theme-buttons-hint');
@@ -952,6 +1058,19 @@ function initChatDisplaySwitcher() {
 * @param {string} value - Setting value
 */
 export function applyThemeSetting(varId, value) {
+    const settings = getMoonlitSettings();
+    if (settings?.enabled === false) {
+        document.documentElement.style.removeProperty(`--${varId}`);
+        if (NATIVE_THEME_EFFECT_VAR_IDS.has(varId)) {
+            restoreNativeThemeEffects();
+        }
+
+        document.dispatchEvent(new CustomEvent('themeSettingChanged', {
+            detail: { varId, value }
+        }));
+        return;
+    }
+
     if (shouldApplyThemeSetting(varId, value)) {
         document.documentElement.style.setProperty(`--${varId}`, value, 'important');
     } else {
@@ -966,10 +1085,10 @@ export function applyThemeSetting(varId, value) {
 }
 // Inject raw CSS (unfiltered) into the page via a dedicated <style> tag
 function applyRawCustomCss(cssText) {
-    let rawStyle = document.getElementById('moonlit-raw-css');
+    let rawStyle = document.getElementById(RAW_CUSTOM_CSS_ID);
     if (!rawStyle) {
         rawStyle = document.createElement('style');
-        rawStyle.id = 'moonlit-raw-css';
+        rawStyle.id = RAW_CUSTOM_CSS_ID;
         // DO NOT sanitize or filter; user explicitly wants full control
         document.head.appendChild(rawStyle);
     }
@@ -979,7 +1098,12 @@ function applyRawCustomCss(cssText) {
 document.addEventListener('themeSettingChanged', (ev) => {
     const { varId, value } = ev.detail || {};
     if (varId === 'rawCustomCss') {
-        applyRawCustomCss(value);
+        const settings = getMoonlitSettings();
+        if (settings?.enabled === false) {
+            removeRawCustomCss();
+        } else {
+            applyRawCustomCss(value);
+        }
     }
 });
 
