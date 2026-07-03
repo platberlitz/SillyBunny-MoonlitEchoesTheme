@@ -463,6 +463,10 @@ export function toggleCss(shouldLoad) {
 
         // Re-apply all checkbox styles if they were enabled
         updateAllCheckboxStyles(true);
+
+        // Re-apply theme CSS variables (may have been removed on disable)
+        applyAllThemeSettings();
+
         syncChatStyleEnabledState(true);
     } else {
         syncChatStyleEnabledState(false);
@@ -471,6 +475,11 @@ export function toggleCss(shouldLoad) {
         if (existingLinkStyle) existingLinkStyle.remove();
         if (existingLinkExt) existingLinkExt.remove();
         if (existingChatStyleLink) existingChatStyleLink.remove();
+
+        // Remove dynamic theme variables so base app CSS (e.g.
+        // #chat backdrop-filter blur) doesn't use orphaned theme values
+        const dynamicThemeStyles = document.getElementById('dynamic-theme-styles');
+        if (dynamicThemeStyles) dynamicThemeStyles.remove();
 
         // Remove hint
         const existingHint = document.getElementById('moonlit-theme-buttons-hint');
