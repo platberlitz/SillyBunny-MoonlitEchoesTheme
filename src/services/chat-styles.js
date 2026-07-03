@@ -236,13 +236,21 @@ export function syncChatStyleEnabledState(enabled) {
         return;
     }
 
-    // Moonlit chat styles depend on CSS variables provided by the theme
-    // stylesheets. When the theme is disabled those variables disappear and
-    // the Moonlit styles (blur/transform/calc) render the page unusable.
-    // Fall back to the last core style (Flat/Bubbles/Document) for display,
-    // but keep the dropdown and saved value on the Moonlit style so it can
-    // be restored instantly on re-enable.
-    applyChatStyle(getCoreFallbackStyle(), { context, syncSelect: false });
+    // When disabled, force the select and base app to a core style so the
+    // native SillyBunny handler doesn't reapply Moonlit body classes after
+    // we remove the stylesheets. Use jQuery trigger to ensure base handlers run.
+    const fallbackValue = getCoreFallbackStyle();
+    const select = getChatDisplaySelect();
+    
+    if (select) {
+        select.value = fallbackValue;
+        const jquery = globalThis.jQuery || globalThis.$;
+        if (typeof jquery === 'function') {
+            jquery(select).trigger('change');
+        } else {
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
 }
 
 export function initChatStyleIntegration({ t } = {}) {
