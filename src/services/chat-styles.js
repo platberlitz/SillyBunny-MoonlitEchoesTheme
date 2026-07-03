@@ -32,6 +32,7 @@ const CORE_STYLE_VALUES = new Set(['0', '1', '2']);
 const ALL_CHAT_STYLE_CLASSES = Object.values(CHAT_STYLE_CLASSES);
 let lastCoreStyleValue = '0';
 let coreStyleListenerInitialized = false;
+let nativeHandoffInProgress = false;
 
 function getContextSafe() {
     try {
@@ -78,6 +79,16 @@ function getChatDisplaySelect() {
     return document.getElementById('chat_display');
 }
 
+function isThemeEnabled() {
+    const context = getContextSafe();
+    const settings = context ? getExtensionSettings(context) : null;
+    return settings?.enabled !== false;
+}
+
+function shouldUseNativeChatStyleHandler() {
+    return nativeHandoffInProgress || !isThemeEnabled();
+}
+
 function getSelectedChatStyleValue(select = getChatDisplaySelect()) {
     const selectedOptionValue = select?.selectedOptions?.[0]?.value;
     return normalizeChatStyleValue(selectedOptionValue ?? select?.value, '');
@@ -113,6 +124,56 @@ function getSavedChatStyle(settings, select = getChatDisplaySelect()) {
     }
 
     return fallback;
+}
+
+function getEnabledChatStyle(settings, select = getChatDisplaySelect()) {
+    const selectedStyle = getSelectedChatStyleValue(select);
+    if (isMoonlitChatStyleValue(selectedStyle)) {
+        return selectedStyle;
+    }
+
+    return getSavedChatStyle(settings, select);
+}
+
+function getNativeHandoffStyle(settings, select = getChatDisplaySelect()) {
+    const candidates = [
+        getSelectedChatStyleValue(select),
+        select?.dataset?.moonlitCurrentValue,
+        document.body?.dataset?.moonlitChatStyle,
+        settings?.chatStyle,
+        getStorageValue(CHAT_STYLE_STORAGE_KEY),
+        getStorageValue(LEGACY_CHAT_STYLE_STORAGE_KEY),
+        select?.dataset?.sbCurrentValue,
+        select?.value,
+    ];
+
+    for (const candidate of candidates) {
+        const normalized = normalizeChatStyleValue(candidate, '');
+        if (normalized) {
+            return normalized;
+        }
+    }
+
+    return getCoreFallbackStyle(select);
+}
+
+function triggerNativeChatDisplayChange(select) {
+    if (!select) {
+        return;
+    }
+
+    nativeHandoffInProgress = true;
+    try {
+        const jquery = globalThis.jQuery || globalThis.$;
+        if (typeof jquery === 'function') {
+            jquery(select).trigger('change');
+            return;
+        }
+
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+    } finally {
+        nativeHandoffInProgress = false;
+    }
 }
 
 function persistChatStyle(value, context = getContextSafe()) {
@@ -229,27 +290,21 @@ export function setChatStyle(value, options = {}) {
 export function syncChatStyleEnabledState(enabled) {
     const context = getContextSafe();
     const settings = context ? getExtensionSettings(context) : null;
-    const savedStyle = getSavedChatStyle(settings);
+    const select = getChatDisplaySelect();
+    const savedStyle = getEnabledChatStyle(settings, select);
 
     if (enabled) {
         applyChatStyle(savedStyle, { context });
         return;
     }
 
-    // When disabled, force the select and base app to a core style so the
-    // native SillyBunny handler doesn't reapply Moonlit body classes after
-    // we remove the stylesheets. Use jQuery trigger to ensure base handlers run.
-    const fallbackValue = getCoreFallbackStyle();
-    const select = getChatDisplaySelect();
-    
+    // When disabled, hand the current chat style back to SillyBunny's native
+    // handler. The fork supports Echo/Whisper/Hush/Ripple/Tide itself, so we
+    // should not downgrade those values to Bubbles/Flat/Document.
+    const handoffValue = getNativeHandoffStyle(settings, select);
     if (select) {
-        select.value = fallbackValue;
-        const jquery = globalThis.jQuery || globalThis.$;
-        if (typeof jquery === 'function') {
-            jquery(select).trigger('change');
-        } else {
-            select.dispatchEvent(new Event('change', { bubbles: true }));
-        }
+        setSelectValue(select, handoffValue);
+        triggerNativeChatDisplayChange(select);
     }
 }
 
@@ -262,6 +317,10 @@ export function initChatStyleIntegration({ t } = {}) {
 
     if (select && !select[SELECT_LISTENER_KEY]) {
         select.addEventListener('change', (event) => {
+            if (shouldUseNativeChatStyleHandler()) {
+                return;
+            }
+
             const selectedValue = getSelectedChatStyleValue(select);
             if (isCoreChatStyleValue(selectedValue)) {
                 persistCoreChatStyleSelection(selectedValue, context);
@@ -278,6 +337,10 @@ export function initChatStyleIntegration({ t } = {}) {
         }, true);
 
         select.addEventListener('change', () => {
+            if (shouldUseNativeChatStyleHandler()) {
+                return;
+            }
+
             const selectedValue = getSelectedChatStyleValue(select);
             if (isCoreChatStyleValue(selectedValue)) {
                 persistCoreChatStyleSelection(selectedValue);
@@ -290,6 +353,10 @@ export function initChatStyleIntegration({ t } = {}) {
     const jquery = globalThis.jQuery || globalThis.$;
     if (select && !select[SELECT_JQUERY_LISTENER_KEY] && typeof jquery === 'function') {
         jquery(select).on('change.moonlitEchoesChatStyle', () => {
+            if (shouldUseNativeChatStyleHandler()) {
+                return;
+            }
+
             const selectedValue = getSelectedChatStyleValue(select);
             if (isCoreChatStyleValue(selectedValue)) {
                 persistCoreChatStyleSelection(selectedValue);
@@ -323,15 +390,18 @@ export function initChatStyleIntegration({ t } = {}) {
         coreStyleListenerInitialized = true;
     }
 
-    const savedInitialStyle = getSavedChatStyle(settings, select);
     const themeEnabled = settings?.enabled !== false;
-    const initialStyle = themeEnabled ? savedInitialStyle : getCoreFallbackStyle(select);
-    if (themeEnabled && settings && settings.chatStyle !== savedInitialStyle) {
+    if (!themeEnabled) {
+        return;
+    }
+
+    const savedInitialStyle = getEnabledChatStyle(settings, select);
+    if (settings && settings.chatStyle !== savedInitialStyle) {
         settings.chatStyle = savedInitialStyle;
         saveExtensionSettings(context);
     }
 
-    applyChatStyle(initialStyle, {
+    applyChatStyle(savedInitialStyle, {
         context,
         syncSelect: themeEnabled,
     });
