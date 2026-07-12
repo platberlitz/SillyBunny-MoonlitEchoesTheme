@@ -2469,7 +2469,7 @@ body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_selec
 @media screen and (max-width: 768px) {
     /* Keep the avatar and metadata in one grid track across SillyBunny versions.
        Older drawer layouts can otherwise place the avatar below tall tag lists. */
-    body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
+    body:not(.charListGrid) #right-nav-panel #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
     > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar) {
         --moonlit-character-list-avatar-size: var(--sb-character-list-avatar-size, 56px);
 
@@ -2479,7 +2479,7 @@ body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_selec
         align-items: center !important;
     }
 
-    body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
+    body:not(.charListGrid) #right-nav-panel #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
     > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
     > :is(.avatar, .missing-avatar, .bogus_folder_back_placeholder) {
         grid-column: 1 !important;
@@ -2497,14 +2497,14 @@ body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_selec
         overflow: hidden;
     }
 
-    body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
+    body:not(.charListGrid) #right-nav-panel #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
     > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
     > :is(.missing-avatar, .bogus_folder_back_placeholder) {
         display: grid !important;
         place-items: center;
     }
 
-    body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
+    body:not(.charListGrid) #right-nav-panel #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
     > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
     > .avatar:not(.avatar_collage) > img {
         inline-size: 100% !important;
@@ -2517,7 +2517,7 @@ body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_selec
         object-position: center;
     }
 
-    body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
+    body:not(.charListGrid) #right-nav-panel #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
     > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
     > :is(.character_select_container, .group_select_container) {
         grid-column: 2 !important;
