@@ -2466,6 +2466,71 @@ body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_selec
     grid-row: 1 !important;
 }
 
+@media screen and (max-width: 768px) {
+    /* Keep the avatar and metadata in one grid track across SillyBunny versions.
+       Older drawer layouts can otherwise place the avatar below tall tag lists. */
+    body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
+    > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar) {
+        --moonlit-character-list-avatar-size: var(--sb-character-list-avatar-size, 56px);
+
+        display: grid !important;
+        grid-template-columns: var(--moonlit-character-list-avatar-size) minmax(0, 1fr) !important;
+        grid-template-rows: auto !important;
+        align-items: center !important;
+    }
+
+    body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
+    > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
+    > :is(.avatar, .missing-avatar, .bogus_folder_back_placeholder) {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        align-self: center !important;
+        justify-self: center !important;
+        inline-size: var(--moonlit-character-list-avatar-size) !important;
+        block-size: var(--moonlit-character-list-avatar-size) !important;
+        min-inline-size: var(--moonlit-character-list-avatar-size) !important;
+        max-inline-size: var(--moonlit-character-list-avatar-size) !important;
+        min-block-size: var(--moonlit-character-list-avatar-size) !important;
+        max-block-size: var(--moonlit-character-list-avatar-size) !important;
+        aspect-ratio: 1 / 1 !important;
+        margin: 0 !important;
+        overflow: hidden;
+    }
+
+    body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
+    > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
+    > :is(.missing-avatar, .bogus_folder_back_placeholder) {
+        display: grid !important;
+        place-items: center;
+    }
+
+    body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
+    > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
+    > .avatar:not(.avatar_collage) > img {
+        inline-size: 100% !important;
+        block-size: 100% !important;
+        min-inline-size: 100% !important;
+        max-inline-size: 100% !important;
+        min-block-size: 100% !important;
+        max-block-size: 100% !important;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
+    > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
+    > :is(.character_select_container, .group_select_container) {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        align-self: stretch !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        align-items: start !important;
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+}
+
 body:not(.charListGrid) {
     .bogus_folder_select .avatar,
     .character_select .avatar {
