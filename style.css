@@ -2434,6 +2434,26 @@ body.charListGrid #rm_print_characters_block .group_select {
         justify-self: center;
     }
 }
+
+#rm_print_characters_block:not(.group_overlay_mode_select)
+> :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
+> :is(.avatar, .missing-avatar) {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: center !important;
+    justify-self: center !important;
+    flex: 0 0 var(--avatar-base-width);
+    margin: 0;
+}
+
+@media screen and (max-width: 1000px) {
+    body #rm_print_characters_block:not(.group_overlay_mode_select)
+    > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
+    > :is(.avatar, .missing-avatar) {
+        grid-row: 1 / -1 !important;
+    }
+}
+
 body:not(.charListGrid) {
     .bogus_folder_select .avatar,
     .character_select .avatar {

@@ -159,77 +159,26 @@ function installDisableChatSurfaceReset() {
     }
 
     resetStyle.textContent = `
-@supports (-webkit-touch-callout: none) {
-    html.${DISABLE_CHAT_SURFACE_RESET_CLASS} #sheld:not([data-sb-conversation-mode="on"]) {
-        opacity: 1 !important;
-        visibility: visible !important;
-    }
-
-    html.${DISABLE_CHAT_SURFACE_RESET_CLASS} #sheld:not([data-sb-conversation-mode="on"]) #chat {
-        display: flex !important;
-        flex: 1 1 auto !important;
-        min-height: 0 !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
+html.${DISABLE_CHAT_SURFACE_RESET_CLASS} #sheld:not([data-sb-conversation-mode="on"]) > #chat {
         -webkit-mask: none !important;
         mask: none !important;
         -webkit-mask-image: none !important;
         mask-image: none !important;
         -webkit-transform: translateZ(0) !important;
         transform: translateZ(0) !important;
-    }
-
-    html.${DISABLE_CHAT_SURFACE_RESET_CLASS} #sheld:not([data-sb-conversation-mode="on"]) #form_sheld {
-        opacity: 1 !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-        -webkit-mask: none !important;
-        mask: none !important;
-        -webkit-mask-image: none !important;
-        mask-image: none !important;
-    }
 }`;
 
     document.documentElement.classList.add(DISABLE_CHAT_SURFACE_RESET_CLASS);
+    flushChatSurfaceLayout();
 }
 
 
-function refreshChatSurfaceAfterDisable() {
-    installDisableChatSurfaceReset();
-
+function flushChatSurfaceLayout() {
     const chat = document.getElementById('chat');
-    const sheld = document.getElementById('sheld');
-    const chatScrollTop = chat instanceof HTMLElement ? chat.scrollTop : null;
-
-    const refresh = () => {
-        if (sheld instanceof HTMLElement) {
-            void sheld.offsetHeight;
-        }
-
-        if (chat instanceof HTMLElement) {
-            void chat.offsetHeight;
-            if (chatScrollTop !== null) {
-                chat.scrollTop = chatScrollTop;
-            }
-        }
-
-        window.dispatchEvent(new Event('resize'));
-        window.dispatchEvent(new CustomEvent('sb-mobile-viewport-reset', {
-            detail: { restoreScroll: true },
-        }));
-    };
-
-    refresh();
-
-    if (typeof window.requestAnimationFrame === 'function') {
-        window.requestAnimationFrame(refresh);
-    } else {
-        window.setTimeout(refresh, 0);
+    if (chat instanceof HTMLElement) {
+        void window.getComputedStyle(chat).maskImage;
+        void chat.offsetHeight;
     }
-
-    window.setTimeout(refresh, 180);
-    window.setTimeout(refresh, 420);
 }
 
 
@@ -674,6 +623,14 @@ export function toggleCss(shouldLoad) {
 
         syncChatStyleEnabledState(true);
     } else {
+        if (shouldRefreshChatSurface) {
+            // Neutralize Moonlit's mask before detaching its stylesheet so the
+            // browser cannot retain a transparent composited chat layer.
+            installDisableChatSurfaceReset();
+        } else {
+            removeDisableChatSurfaceReset();
+        }
+
         syncChatStyleEnabledState(false);
 
         // Remove CSS
@@ -695,12 +652,7 @@ export function toggleCss(shouldLoad) {
         clearAllCheckboxStyles();
 
         if (shouldRefreshChatSurface) {
-            // Mobile Safari can retain a stale masked/composited #chat layer after
-            // Moonlit's stylesheet is detached. Force the base chat surface visible
-            // and ask SillyBunny to recalculate its mobile viewport bounds.
-            refreshChatSurfaceAfterDisable();
-        } else {
-            removeDisableChatSurfaceReset();
+            flushChatSurfaceLayout();
         }
     }
 }
