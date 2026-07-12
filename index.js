@@ -127,13 +127,6 @@ function clearInlineThemeSettings({ restoreNative = true } = {}) {
 }
 
 
-function hasInlineThemeSettings() {
-    return themeCustomSettings.some(({ varId }) => (
-        varId && document.documentElement.style.getPropertyValue(`--${varId}`)
-    ));
-}
-
-
 function removeDynamicThemeStyles() {
     document.getElementById('dynamic-theme-styles')?.remove();
 }
@@ -159,13 +152,11 @@ function installDisableChatSurfaceReset() {
     }
 
     resetStyle.textContent = `
-html.${DISABLE_CHAT_SURFACE_RESET_CLASS} #sheld:not([data-sb-conversation-mode="on"]) > #chat {
+@supports (-webkit-touch-callout: none) {
+    html.${DISABLE_CHAT_SURFACE_RESET_CLASS} #sheld:not([data-sb-conversation-mode="on"]) > #chat {
         -webkit-mask: none !important;
         mask: none !important;
-        -webkit-mask-image: none !important;
-        mask-image: none !important;
-        -webkit-transform: translateZ(0) !important;
-        transform: translateZ(0) !important;
+    }
 }`;
 
     document.documentElement.classList.add(DISABLE_CHAT_SURFACE_RESET_CLASS);
@@ -573,7 +564,6 @@ export function toggleCss(shouldLoad) {
         || existingChatStyleLink
         || existingDynamicThemeStyles
         || existingRawCustomCss
-        || hasInlineThemeSettings()
         || document.documentElement.classList.contains(DISABLE_CHAT_SURFACE_RESET_CLASS),
     );
 
