@@ -2466,26 +2466,6 @@ body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_selec
     grid-row: 1 !important;
 }
 
-@media screen and (max-width: 768px) {
-    body.big-avatars:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
-    > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar) {
-        grid-template-columns: max-content minmax(0, 1fr) !important;
-    }
-
-    body.big-avatars:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
-    > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
-    > :is(.avatar, .missing-avatar) {
-        width: calc(var(--avatar-base-width) * var(--big-avatar-width-factor)) !important;
-        min-width: calc(var(--avatar-base-width) * var(--big-avatar-width-factor)) !important;
-        max-width: calc(var(--avatar-base-width) * var(--big-avatar-width-factor)) !important;
-        height: calc(var(--avatar-base-height) * var(--big-avatar-height-factor)) !important;
-        min-height: calc(var(--avatar-base-height) * var(--big-avatar-height-factor)) !important;
-        max-height: calc(var(--avatar-base-height) * var(--big-avatar-height-factor)) !important;
-        aspect-ratio: 2 / 3 !important;
-        flex: 0 0 auto !important;
-    }
-}
-
 body:not(.charListGrid) {
     .bogus_folder_select .avatar,
     .character_select .avatar {
