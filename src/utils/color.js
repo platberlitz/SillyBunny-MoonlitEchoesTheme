@@ -4,30 +4,7 @@
  * @returns {string|null} HEX color string or null.
  */
 export function rgbaToHex(rgba) {
-    if (!rgba) {
-        return null;
-    }
-
-    if (rgba.startsWith('var(--')) {
-        return null;
-    }
-
-    if (rgba.startsWith('#')) {
-        return rgba;
-    }
-
-    const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-    if (!match) return null;
-
-    const r = parseInt(match[1], 10);
-    const g = parseInt(match[2], 10);
-    const b = parseInt(match[3], 10);
-
-    if ([r, g, b].some((value) => Number.isNaN(value) || value < 0 || value > 255)) {
-        return null;
-    }
-
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    return parseColorValue(rgba)?.hex || null;
 }
 
 /**
@@ -36,19 +13,7 @@ export function rgbaToHex(rgba) {
  * @returns {number} Opacity value between 0 and 1.
  */
 export function getAlphaFromRgba(rgba) {
-    if (!rgba || rgba.startsWith('var(--')) {
-        return 1;
-    }
-
-    if (rgba.startsWith('#')) {
-        return 1;
-    }
-
-    const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-    if (!match) return 1;
-
-    const alpha = match[4] ? parseFloat(match[4]) : 1;
-    return Math.min(Math.max(alpha, 0), 1);
+    return parseColorValue(rgba)?.alpha ?? 1;
 }
 
 /**
@@ -58,28 +23,18 @@ export function getAlphaFromRgba(rgba) {
  * @returns {string} RGBA formatted string.
  */
 export function hexToRgba(hex, alpha = 1) {
-    if (!hex) return 'rgba(0, 0, 0, 1)';
+    const normalized = normalizeHex(hex);
+    if (!normalized) return 'rgba(0, 0, 0, 1)';
 
-    try {
-        let normalized = hex.replace('#', '');
+    const numericAlpha = Number(alpha);
+    const constrainedAlpha = Number.isFinite(numericAlpha)
+        ? Math.min(Math.max(numericAlpha, 0), 1)
+        : 1;
+    const r = parseInt(normalized.slice(1, 3), 16);
+    const g = parseInt(normalized.slice(3, 5), 16);
+    const b = parseInt(normalized.slice(5, 7), 16);
 
-        if (normalized.length === 3) {
-            normalized = normalized.split('').map((char) => char + char).join('');
-        }
-
-        if (!/^[0-9A-Fa-f]{6}$/.test(normalized)) {
-            return 'rgba(0, 0, 0, 1)';
-        }
-
-        const r = parseInt(normalized.substring(0, 2), 16);
-        const g = parseInt(normalized.substring(2, 4), 16);
-        const b = parseInt(normalized.substring(4, 6), 16);
-        const constrainedAlpha = Math.min(Math.max(alpha, 0), 1);
-
-        return `rgba(${r}, ${g}, ${b}, ${constrainedAlpha})`;
-    } catch {
-        return 'rgba(0, 0, 0, 1)';
-    }
+    return `rgba(${r}, ${g}, ${b}, ${constrainedAlpha})`;
 }
 
 /**
@@ -88,33 +43,36 @@ export function hexToRgba(hex, alpha = 1) {
  * @returns {Object|null} Parsed color data.
  */
 export function parseColorValue(color) {
-    if (!color) return null;
+    if (typeof color !== 'string') return null;
 
     const trimmed = color.trim();
+    const normalizedHex = normalizeHex(trimmed);
 
-    if (trimmed.startsWith('#')) {
+    if (normalizedHex) {
         return {
-            hex: trimmed,
-            rgba: hexToRgba(trimmed, 1),
+            hex: normalizedHex,
+            rgba: hexToRgba(normalizedHex, 1),
             alpha: 1,
         };
     }
 
-    const rgbaMatch = trimmed.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-    if (rgbaMatch) {
-        const r = parseInt(rgbaMatch[1], 10);
-        const g = parseInt(rgbaMatch[2], 10);
-        const b = parseInt(rgbaMatch[3], 10);
-        const alpha = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
+    const rgbaMatch = trimmed.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*([+-]?(?:(?:\d+(?:\.\d*)?)|(?:\.\d+))(?:e[+-]?\d+)?))?\s*\)$/i);
+    if (!rgbaMatch) return null;
 
-        return {
-            hex: `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`,
-            rgba: `rgba(${r}, ${g}, ${b}, ${alpha})`,
-            alpha,
-        };
+    const r = Number(rgbaMatch[1]);
+    const g = Number(rgbaMatch[2]);
+    const b = Number(rgbaMatch[3]);
+    const alpha = rgbaMatch[4] === undefined ? 1 : Number(rgbaMatch[4]);
+
+    if ([r, g, b].some((value) => value > 255) || !Number.isFinite(alpha) || alpha < 0 || alpha > 1) {
+        return null;
     }
 
-    return null;
+    return {
+        hex: `#${toHex(r)}${toHex(g)}${toHex(b)}`,
+        rgba: `rgba(${r}, ${g}, ${b}, ${alpha})`,
+        alpha,
+    };
 }
 
 /**
@@ -123,12 +81,26 @@ export function parseColorValue(color) {
  * @returns {string} RGB segment string.
  */
 export function getRgbPartFromRgba(rgba) {
-    if (!rgba || rgba.startsWith('var(--')) {
-        return '0, 0, 0';
+    const parsed = parseColorValue(rgba);
+    if (!parsed) return '0, 0, 0';
+
+    const match = parsed.rgba.match(/^rgba\((\d+), (\d+), (\d+),/);
+    return match ? `${match[1]}, ${match[2]}, ${match[3]}` : '0, 0, 0';
+}
+
+function normalizeHex(hex) {
+    if (typeof hex !== 'string' || !/^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(hex)) {
+        return null;
     }
 
-    const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-    if (!match) return '0, 0, 0';
+    const value = hex.slice(1).toLowerCase();
+    const expanded = value.length === 3
+        ? value.split('').map((character) => character.repeat(2)).join('')
+        : value;
 
-    return `${match[1]}, ${match[2]}, ${match[3]}`;
+    return `#${expanded}`;
+}
+
+function toHex(value) {
+    return value.toString(16).padStart(2, '0');
 }

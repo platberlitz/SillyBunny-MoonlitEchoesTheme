@@ -2,7 +2,7 @@ import { t } from '../../../../../i18n.js';
 import { EXTENSION_FOLDER_PATH } from '../config/theme-info.js';
 import { themeCustomSettings } from '../config/theme-settings.js';
 import { getSettings as getExtensionSettings, saveSettings as saveExtensionSettings } from '../services/settings-service.js';
-import { rgbaToHex, getAlphaFromRgba } from '../utils/color.js';
+import { rgbaToHex, getAlphaFromRgba, hexToRgba, parseColorValue } from '../utils/color.js';
 
 const SETTINGS_STYLES_ID = 'moonlit-modern-styles';
 const SETTINGS_STYLES_URL = new URL('./settings-factory.css', import.meta.url).href;
@@ -163,6 +163,8 @@ function createColorPicker(container, setting, settings) {
     const context = SillyTavern.getContext();
     const { varId, default: defaultValue } = setting;
     const currentValue = settings[varId] || defaultValue;
+    const initialHexValue = rgbaToHex(currentValue);
+    const initialAlphaValue = getAlphaFromRgba(currentValue);
 
     const colorPickerContainer = document.createElement('div');
     colorPickerContainer.classList.add('theme-color-picker');
@@ -188,7 +190,6 @@ function createColorPicker(container, setting, settings) {
     const textInput = document.createElement('input');
     textInput.id = `cts-${varId}-text`;
     textInput.type = 'text';
-    const initialHexValue = rgbaToHex(currentValue);
     textInput.value = initialHexValue || currentValue;
     textInput.classList.add('color-input-text');
     textInput.style.flex = '1';
@@ -203,7 +204,7 @@ function createColorPicker(container, setting, settings) {
     const colorInput = document.createElement('input');
     colorInput.id = `cts-${varId}-color`;
     colorInput.type = 'color';
-    colorInput.value = rgbaToHex(currentValue) || '#ffffff';
+    colorInput.value = initialHexValue || '#ffffff';
     colorInput.style.width = '1px';
     colorInput.style.height = '1px';
     colorInput.style.opacity = '0';
@@ -234,7 +235,7 @@ function createColorPicker(container, setting, settings) {
     alphaSlider.min = '0';
     alphaSlider.max = '100';
     alphaSlider.step = '1';
-    alphaSlider.value = Math.round(getAlphaFromRgba(currentValue) * 100);
+    alphaSlider.value = Math.round(initialAlphaValue * 100);
     alphaSlider.style.flex = '1';
     alphaSlider.style.height = '5px';
     alphaSlider.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
@@ -244,82 +245,35 @@ function createColorPicker(container, setting, settings) {
 
     const alphaValue = document.createElement('span');
     alphaValue.id = `cts-${varId}-alpha-value`;
-    alphaValue.textContent = Math.round(getAlphaFromRgba(currentValue) * 100);
+    alphaValue.textContent = Math.round(initialAlphaValue * 100);
     alphaValue.style.minWidth = '28px';
     alphaValue.style.textAlign = 'right';
 
-    const styleElem = document.createElement('style');
-    styleElem.id = `color-slider-style-${varId}`;
-    document.head.appendChild(styleElem);
-
     textInput.addEventListener('input', () => {
-        const hexValue = textInput.value;
-        if (/^#[0-9A-Fa-f]{6}$/.test(hexValue)) {
-            const rgbaColor = hexToRgba(hexValue, alphaSlider.value / 100);
-            colorPreview.style.background = rgbaColor;
-            colorInput.value = hexValue;
-        }
+        if (!isSixDigitHex(textInput.value)) return;
+
+        const parsedColor = parseColorValue(textInput.value);
+        const alpha = alphaSlider.value / 100;
+        colorPreview.style.background = hexToRgba(parsedColor.hex, alpha);
+        colorInput.value = parsedColor.hex;
     });
 
     textInput.addEventListener('change', () => {
         const inputValue = textInput.value.trim();
-        if (/^#[0-9A-Fa-f]{6}$/.test(inputValue)) {
-            colorInput.value = inputValue;
-            updateColor();
-        } else if (/^rgba?\([^)]*\)$/.test(inputValue)) {
-            try {
-                const rgbaValue = inputValue.replace(/\s+/g, '');
-                const tempElement = document.createElement('div');
-                tempElement.style.color = rgbaValue;
-                if (tempElement.style.color) {
-                    const rgbaColor = getComputedStyle(tempElement).color;
-                    colorPreview.style.background = rgbaColor;
-                    const hexColor = rgbaToHex(rgbaColor);
-                    if (hexColor) {
-                        colorInput.value = hexColor;
-                        const [, , , a] = rgbaColor.match(/rgba?\((\d+),(\d+),(\d+)(?:,([\d.]+))?\)/) || [];
-                        const alpha = a ? parseFloat(a) : 1;
-                        alphaSlider.value = Math.round(alpha * 100);
-                        alphaValue.textContent = Math.round(alpha * 100);
-                        updateSliderThumbColor(hexColor);
-                        settings[varId] = rgbaColor;
-                        applyThemeSettingFn(varId, rgbaColor);
-                        syncAndSaveSettings(settings, context);
-                    }
-                }
-            } catch {
-                const previousHex = rgbaToHex(settings[varId]);
-                textInput.value = previousHex || settings[varId] || defaultValue;
-            }
-        } else {
-            try {
-                const rgbaValue = inputValue.replace(/\s+/g, '');
-                const tempElement = document.createElement('div');
-                tempElement.style.color = rgbaValue;
-                if (tempElement.style.color) {
-                    const rgbaColor = getComputedStyle(tempElement).color;
-                    colorPreview.style.background = rgbaColor;
-                    const hexColor = rgbaToHex(rgbaColor);
-                    if (hexColor) {
-                        colorInput.value = hexColor;
-                        const [, , , a] = rgbaColor.match(/rgba?\((\d+),(\d+),(\d+)(?:,([\d.]+))?\)/) || [];
-                        const alpha = a ? parseFloat(a) : 1;
-                        alphaSlider.value = Math.round(alpha * 100);
-                        alphaValue.textContent = Math.round(alpha * 100);
-                        updateSliderThumbColor(hexColor);
-                        settings[varId] = rgbaColor;
-                        applyThemeSettingFn(varId, rgbaColor);
-                        syncAndSaveSettings(settings, context);
-                    }
-                } else {
-                    const previousHex = rgbaToHex(settings[varId]);
-                    textInput.value = previousHex || settings[varId] || defaultValue;
-                }
-            } catch {
-                const previousHex = rgbaToHex(settings[varId]);
-                textInput.value = previousHex || settings[varId] || defaultValue;
-            }
+        const isHexInput = isSixDigitHex(inputValue);
+        const parsedColor = isHexInput
+            ? withAlpha(parseColorValue(inputValue), alphaSlider.value / 100)
+            : parseCssColorValue(inputValue);
+
+        if (!parsedColor) {
+            restoreTextInput();
+            return;
         }
+
+        commitColor(parsedColor, {
+            updateText: isHexInput,
+            dispatchColorChanged: isHexInput,
+        });
     });
 
     colorPreview.addEventListener('click', () => {
@@ -327,96 +281,55 @@ function createColorPicker(container, setting, settings) {
     });
 
     colorInput.addEventListener('input', () => {
-        updateColorAndAlpha();
-        alphaSlider.dispatchEvent(new Event('input'));
+        commitColor(withAlpha(parseColorValue(colorInput.value), alphaSlider.value / 100), {
+            updateText: true,
+        });
     });
 
     alphaSlider.addEventListener('input', () => {
-        alphaValue.textContent = alphaSlider.value;
-        const hexColor = colorInput.value;
-        updateSliderThumbColor(hexColor);
-        updateColorAndAlpha();
+        commitCurrentControls();
     });
 
     alphaSlider.addEventListener('change', () => {
-        const hexColor = colorInput.value;
-        updateSliderThumbColor(hexColor);
-        updateColorAndAlpha();
+        commitCurrentControls();
     });
 
     textInput.addEventListener('focusout', () => {
-        const inputValue = textInput.value.trim();
-        if (!/^#[0-9A-Fa-f]{6}$/.test(inputValue)) {
-            const previousHex = rgbaToHex(settings[varId]);
-            textInput.value = previousHex || settings[varId] || defaultValue;
-        }
+        if (!isSixDigitHex(textInput.value.trim())) restoreTextInput();
     });
 
-    function updateSliderThumbColor(hexColor) {
-        const newThumbStyle = `
-            #${alphaSlider.id}::-webkit-slider-thumb {
-                appearance: none;
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                background: ${hexColor};
-                border: 1px solid color-mix(in srgb, var(--SmartThemeBodyColor) 10%, transparent);
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-                cursor: pointer;
-            }
-            #${alphaSlider.id}::-moz-range-thumb {
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                background: ${hexColor};
-                border: 1px solid color-mix(in srgb, var(--SmartThemeBodyColor) 10%, transparent);
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-                cursor: pointer;
-            }
-        `;
-
-        styleElem.textContent = newThumbStyle;
+    function commitCurrentControls() {
+        commitColor(withAlpha(parseColorValue(colorInput.value), alphaSlider.value / 100));
     }
 
-    function updateColor() {
-        const hexColor = colorInput.value;
-        const alpha = alphaSlider.value / 100;
-
-        const r = parseInt(hexColor.slice(1, 3), 16);
-        const g = parseInt(hexColor.slice(3, 5), 16);
-        const b = parseInt(hexColor.slice(5, 7), 16);
-
-        const rgbaColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
-
-        colorPreview.style.background = rgbaColor;
-        updateSliderThumbColor(hexColor);
-        textInput.value = hexColor;
-
-        settings[varId] = rgbaColor;
-        applyThemeSettingFn(varId, rgbaColor);
+    function commitColor(color, options = {}) {
+        const { updateText = false, dispatchColorChanged = false } = options;
+        renderColor(color, updateText);
+        settings[varId] = color.rgba;
+        applyThemeSettingFn(varId, color.rgba);
         syncAndSaveSettings(settings, context);
 
-        document.dispatchEvent(new CustomEvent('colorChanged', {
-            detail: { varId, value: rgbaColor, hexColor }
-        }));
+        if (dispatchColorChanged) {
+            document.dispatchEvent(new CustomEvent('colorChanged', {
+                detail: { varId, value: color.rgba, hexColor: color.hex }
+            }));
+        }
     }
 
-    function updateColorAndAlpha() {
-        const hexColor = colorInput.value;
-        const alpha = alphaSlider.value / 100;
+    function renderColor(color, updateText) {
+        const alphaPercent = Math.round(color.alpha * 100);
+        colorPreview.style.background = color.rgba;
+        colorInput.value = color.hex;
+        alphaSlider.value = alphaPercent;
+        alphaValue.textContent = alphaPercent;
+        updateColorSliderThumb(varId, color.hex);
 
-        const r = parseInt(hexColor.slice(1, 3), 16);
-        const g = parseInt(hexColor.slice(3, 5), 16);
-        const b = parseInt(hexColor.slice(5, 7), 16);
+        if (updateText) textInput.value = color.hex;
+    }
 
-        const rgbaColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
-
-        colorPreview.style.background = rgbaColor;
-        updateSliderThumbColor(hexColor);
-
-        settings[varId] = rgbaColor;
-        applyThemeSettingFn(varId, rgbaColor);
-        syncAndSaveSettings(settings, context);
+    function restoreTextInput() {
+        const previousValue = settings[varId] || defaultValue;
+        textInput.value = rgbaToHex(previousValue) || previousValue;
     }
 
     alphaRow.appendChild(alphaSlider);
@@ -432,9 +345,84 @@ function createColorPicker(container, setting, settings) {
     container.appendChild(colorPickerContainer);
 
     setTimeout(() => {
-        const hexColor = rgbaToHex(currentValue) || '#ffffff';
-        updateSliderThumbColor(hexColor);
+        updateColorSliderThumb(varId, initialHexValue || '#ffffff');
     }, 10);
+}
+
+function isSixDigitHex(value) {
+    return /^#[0-9a-f]{6}$/i.test(value);
+}
+
+function withAlpha(color, alpha) {
+    if (!color) return null;
+
+    return {
+        hex: color.hex,
+        rgba: hexToRgba(color.hex, alpha),
+        alpha,
+    };
+}
+
+function parseCssColorValue(value) {
+    const parsedColor = parseColorValue(value);
+    if (parsedColor) return parsedColor;
+
+    const colorProbe = document.createElement('span');
+    colorProbe.style.position = 'absolute';
+    colorProbe.style.visibility = 'hidden';
+    colorProbe.style.color = value;
+    if (!colorProbe.style.color) return null;
+
+    const parent = document.body || document.documentElement;
+    if (!parent) return null;
+
+    parent.appendChild(colorProbe);
+    try {
+        const computedColor = getComputedStyle(colorProbe).color;
+        return parseColorValue(computedColor) || parseRenderedColorValue(computedColor);
+    } catch {
+        return null;
+    } finally {
+        colorProbe.remove();
+    }
+}
+
+function parseRenderedColorValue(value) {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    if (!context) return null;
+
+    // Canvas converts CSS Color 4 values into the sRGB bytes required by the native picker.
+    const serializedColor = serializeColor(value);
+    if (!serializedColor) return null;
+
+    const alphaByte = readPixel(serializedColor)[3];
+    const opaqueColor = serializeColor(`rgb(from ${serializedColor} r g b / 1)`) || serializedColor;
+    const [r, g, b] = readPixel(opaqueColor);
+    const alphaPattern = /\/\s*((?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)\s*(%)?\s*\)$/i;
+    const alphaMatch = value.match(alphaPattern) || serializedColor.match(alphaPattern);
+    const renderedAlpha = alphaMatch
+        ? Number(alphaMatch[1]) / (alphaMatch[2] ? 100 : 1)
+        : alphaByte / 255;
+    const alpha = Math.min(Math.max(renderedAlpha, 0), 1);
+    return parseColorValue(`rgba(${r}, ${g}, ${b}, ${alpha})`);
+
+    function serializeColor(color) {
+        context.fillStyle = '#010203';
+        context.fillStyle = color;
+        const firstResult = context.fillStyle;
+
+        context.fillStyle = '#040506';
+        context.fillStyle = color;
+        return context.fillStyle === firstResult ? firstResult : null;
+    }
+
+    function readPixel(color) {
+        context.clearRect(0, 0, 1, 1);
+        context.fillStyle = color;
+        context.fillRect(0, 0, 1, 1);
+        return context.getImageData(0, 0, 1, 1).data;
+    }
 }
 
 function createSlider(container, setting, settings) {
@@ -808,10 +796,3 @@ document.addEventListener('colorChanged', (event) => {
     const { varId, hexColor } = event.detail;
     updateColorSliderThumb(varId, hexColor);
 });
-
-function hexToRgba(hex, alpha) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
