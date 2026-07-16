@@ -1,5 +1,8 @@
 import { getSettings as getExtensionSettings } from '../services/settings-service.js';
 
+let activeAvatarUpdater = null;
+let activeFormSheldHeightController = null;
+
 function stripOrigin(url) {
     if (!url) return '';
     if (url.startsWith(window.location.origin)) {
@@ -100,7 +103,15 @@ function applyAvatarSources(mes, avatarImg, preferOriginal) {
  * @returns {function} Function to manually trigger avatar updates.
  */
 export function initAvatarInjector() {
+    activeAvatarUpdater?.destroy?.();
+
+    let observer = null;
+    let debounceTimer = null;
+    let isDestroyed = false;
+
     function updateAvatars() {
+        if (isDestroyed) return;
+
         const context = SillyTavern.getContext();
         const settings = getExtensionSettings(context) || {};
         const preferOriginal = settings.useOriginalAvatarImages === true;
@@ -115,7 +126,6 @@ export function initAvatarInjector() {
 
     updateAvatars();
 
-    let debounceTimer;
     const observerCallback = () => {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(updateAvatars, 100);
@@ -123,20 +133,62 @@ export function initAvatarInjector() {
 
     const chatContainer = document.getElementById('chat');
     if (chatContainer) {
-        const observer = new MutationObserver(observerCallback);
+        observer = new MutationObserver(observerCallback);
         observer.observe(chatContainer, { childList: true, subtree: true });
     }
 
+    updateAvatars.destroy = () => {
+        if (isDestroyed) return;
+
+        isDestroyed = true;
+        clearTimeout(debounceTimer);
+        observer?.disconnect();
+
+        if (activeAvatarUpdater === updateAvatars) {
+            activeAvatarUpdater = null;
+        }
+        if (window.updateAvatars === updateAvatars) {
+            delete window.updateAvatars;
+        }
+    };
+
+    activeAvatarUpdater = updateAvatars;
     window.updateAvatars = updateAvatars;
     return updateAvatars;
 }
 
 /**
  * Initialize monitoring of #form_sheld height and expose helper controls.
- * @returns {{update: function, start: function, stop: function}} Control helpers.
+ * @returns {{update: function, start: function, stop: function, destroy: function}} Control helpers.
  */
 export function initFormSheldHeightMonitor() {
+    activeFormSheldHeightController?.destroy();
+
     let isInitialized = false;
+    let isStarted = false;
+    let isDestroyed = false;
+    let observedFormSheld = null;
+    let observedTextArea = null;
+    let uiSetupTimer = null;
+    const pendingTimers = new Set();
+    const listenerController = new AbortController();
+
+    function schedule(callback, delay) {
+        if (!isStarted || isDestroyed) return null;
+
+        const timer = setTimeout(() => {
+            pendingTimers.delete(timer);
+            if (isStarted && !isDestroyed) callback();
+        }, delay);
+        pendingTimers.add(timer);
+        return timer;
+    }
+
+    function clearPendingTimers() {
+        pendingTimers.forEach(clearTimeout);
+        pendingTimers.clear();
+        uiSetupTimer = null;
+    }
 
     function getAccurateHeight(element) {
         if (!element) return 0;
@@ -145,6 +197,8 @@ export function initFormSheldHeightMonitor() {
     }
 
     function updateFormSheldHeight() {
+        if (isDestroyed) return;
+
         const formSheld = document.getElementById('form_sheld');
         if (formSheld) {
             const height = getAccurateHeight(formSheld);
@@ -159,7 +213,11 @@ export function initFormSheldHeightMonitor() {
         let shouldUpdate = false;
 
         for (const mutation of mutations) {
-            if (mutation.target.id === 'form_sheld' || mutation.target.closest?.('#form_sheld')) {
+            if (
+                mutation.target === observedFormSheld ||
+                observedFormSheld?.contains(mutation.target) ||
+                mutation.target === observedFormSheld?.parentElement
+            ) {
                 shouldUpdate = true;
                 break;
             }
@@ -178,7 +236,7 @@ export function initFormSheldHeightMonitor() {
         }
 
         if (shouldUpdate) {
-            setTimeout(updateFormSheldHeight, 0);
+            schedule(updateFormSheldHeight, 0);
         }
     });
 
@@ -194,16 +252,19 @@ export function initFormSheldHeightMonitor() {
         }
     });
 
-    function stopObservers() {
+    function disconnectFormObservers() {
         resizeObserver.disconnect();
         mutationObserver.disconnect();
+        observedFormSheld = null;
     }
 
-    function startObservers() {
-        stopObservers();
+    function observeFormSheld() {
+        disconnectFormObservers();
+        isInitialized = false;
 
         const formSheld = document.getElementById('form_sheld');
         if (formSheld) {
+            observedFormSheld = formSheld;
             resizeObserver.observe(formSheld);
             mutationObserver.observe(formSheld, {
                 childList: true,
@@ -232,7 +293,7 @@ export function initFormSheldHeightMonitor() {
                         node.id === 'form_sheld' ||
                         (node.nodeType === 1 && node.querySelector && node.querySelector('#form_sheld'))
                     ) {
-                        setTimeout(startObservers, 50);
+                        schedule(startObservers, 50);
                         return;
                     }
                 }
@@ -241,78 +302,138 @@ export function initFormSheldHeightMonitor() {
 
         const formSheld = document.getElementById('form_sheld');
         if (formSheld && !isInitialized) {
-            setTimeout(startObservers, 50);
+            schedule(startObservers, 50);
         }
     });
 
     function onTextAreaInput() {
+        if (!isStarted) return;
+
         updateFormSheldHeight();
-        setTimeout(updateFormSheldHeight, 10);
-        setTimeout(updateFormSheldHeight, 100);
+        schedule(updateFormSheldHeight, 10);
+        schedule(updateFormSheldHeight, 100);
     }
 
     function setupTextAreaListener() {
         const textArea = document.getElementById('send_textarea');
-        if (textArea) {
-            textArea.removeEventListener('input', onTextAreaInput);
-            textArea.addEventListener('input', onTextAreaInput);
-        }
+        if (observedTextArea === textArea) return;
+
+        observedTextArea?.removeEventListener('input', onTextAreaInput);
+        observedTextArea = textArea;
+        observedTextArea?.addEventListener('input', onTextAreaInput);
     }
 
-    window.addEventListener('resize', updateFormSheldHeight);
-    window.addEventListener('orientationchange', () => {
-        updateFormSheldHeight();
-        setTimeout(updateFormSheldHeight, 100);
-        setTimeout(updateFormSheldHeight, 500);
-    });
+    function onWindowResize() {
+        if (isStarted) updateFormSheldHeight();
+    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        startObservers();
-        setupTextAreaListener();
-        updateFormSheldHeight();
-        setTimeout(updateFormSheldHeight, 100);
-        setTimeout(updateFormSheldHeight, 500);
-        setTimeout(updateFormSheldHeight, 1000);
-    });
+    function onOrientationChange() {
+        if (!isStarted) return;
 
-    window.addEventListener('load', () => {
-        startObservers();
-        setupTextAreaListener();
         updateFormSheldHeight();
-        setTimeout(updateFormSheldHeight, 500);
-    });
+        schedule(updateFormSheldHeight, 100);
+        schedule(updateFormSheldHeight, 500);
+    }
+
+    function onDomReady() {
+        if (!isStarted || isDestroyed) return;
+
+        startObservers();
+        updateFormSheldHeight();
+        schedule(updateFormSheldHeight, 100);
+        schedule(updateFormSheldHeight, 500);
+        schedule(updateFormSheldHeight, 1000);
+    }
+
+    function onWindowLoad() {
+        if (!isStarted || isDestroyed) return;
+
+        startObservers();
+        updateFormSheldHeight();
+        schedule(updateFormSheldHeight, 500);
+    }
+
+    function onUiInteraction() {
+        schedule(updateFormSheldHeight, 10);
+        schedule(updateFormSheldHeight, 100);
+    }
 
     function setupUIListeners() {
         document.querySelectorAll('#qr--bar .qr--option').forEach((button) => {
-            button.addEventListener('click', () => {
-                setTimeout(updateFormSheldHeight, 10);
-                setTimeout(updateFormSheldHeight, 100);
-            });
+            button.addEventListener('click', onUiInteraction, { signal: listenerController.signal });
         });
 
         const optionsButton = document.getElementById('options_button');
         if (optionsButton) {
-            optionsButton.addEventListener('click', () => {
-                setTimeout(updateFormSheldHeight, 10);
-                setTimeout(updateFormSheldHeight, 100);
-            });
+            optionsButton.addEventListener('click', onUiInteraction, { signal: listenerController.signal });
         }
     }
 
-    setTimeout(setupUIListeners, 1000);
+    function scheduleUIListenerSetup() {
+        if (uiSetupTimer !== null) return;
 
-    bodyObserver.observe(document.body, {
-        childList: true,
-        subtree: true,
-    });
+        uiSetupTimer = schedule(() => {
+            uiSetupTimer = null;
+            setupUIListeners();
+        }, 1000);
+    }
 
-    startObservers();
-    setupTextAreaListener();
-    updateFormSheldHeight();
+    function startObservers() {
+        if (isDestroyed) return;
 
-    return {
+        isStarted = true;
+        if (document.body) {
+            bodyObserver.observe(document.body, {
+                childList: true,
+                subtree: true,
+            });
+        }
+        observeFormSheld();
+        setupTextAreaListener();
+        updateFormSheldHeight();
+        scheduleUIListenerSetup();
+    }
+
+    function stopObservers() {
+        if (isDestroyed) return;
+
+        isStarted = false;
+        isInitialized = false;
+        disconnectFormObservers();
+        bodyObserver.disconnect();
+        observedTextArea?.removeEventListener('input', onTextAreaInput);
+        observedTextArea = null;
+        clearPendingTimers();
+    }
+
+    function destroy() {
+        if (isDestroyed) return;
+
+        stopObservers();
+        isDestroyed = true;
+        listenerController.abort();
+
+        if (activeFormSheldHeightController === controller) {
+            activeFormSheldHeightController = null;
+        }
+        if (window.formSheldHeightController === controller) {
+            delete window.formSheldHeightController;
+        }
+    }
+
+    window.addEventListener('resize', onWindowResize, { signal: listenerController.signal });
+    window.addEventListener('orientationchange', onOrientationChange, { signal: listenerController.signal });
+    document.addEventListener('DOMContentLoaded', onDomReady, { signal: listenerController.signal });
+    window.addEventListener('load', onWindowLoad, { signal: listenerController.signal });
+
+    const controller = {
         update: updateFormSheldHeight,
         start: startObservers,
         stop: stopObservers,
+        destroy,
     };
+
+    startObservers();
+    activeFormSheldHeightController = controller;
+    return controller;
 }
