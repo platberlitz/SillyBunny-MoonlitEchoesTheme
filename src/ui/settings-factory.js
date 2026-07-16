@@ -9,6 +9,7 @@ const SETTINGS_STYLES_URL = new URL('./settings-factory.css', import.meta.url).h
 
 let applyThemeSettingFn = () => {};
 let applyRawCustomCssFn = () => {};
+const checkboxCssVersions = new Map();
 
 /**
  * Persist the current live settings, syncing every themeCustomSettings value
@@ -540,9 +541,77 @@ function createTextareaInput(container, setting, settings) {
     container.appendChild(textarea);
 }
 
+function getCheckboxStyleElement(varId) {
+    let styleElement = document.getElementById(`css-block-${varId}`);
+    if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = `css-block-${varId}`;
+        document.head.appendChild(styleElement);
+    }
+    return styleElement;
+}
+
+async function applyCheckboxCss(setting, settings, enabled) {
+    const { varId, cssBlock, cssFile } = setting;
+    if (!cssBlock && !cssFile) return;
+
+    const version = (checkboxCssVersions.get(varId) || 0) + 1;
+    checkboxCssVersions.set(varId, version);
+    const styleElement = getCheckboxStyleElement(varId);
+    if (!settings || !settings.enabled || !enabled) {
+        styleElement.textContent = '';
+        return;
+    }
+
+    if (cssFile) {
+        try {
+            const response = await fetch(`${EXTENSION_FOLDER_PATH}/css/${cssFile}`);
+            if (response.ok) {
+                const cssText = await response.text();
+                if (
+                    checkboxCssVersions.get(varId) === version &&
+                    settings.enabled &&
+                    settings[varId] === true
+                ) {
+                    styleElement.textContent = cssText;
+                }
+            }
+        } catch {
+            // Silently ignore CSS loading errors.
+        }
+        return;
+    }
+
+    styleElement.textContent = cssBlock;
+}
+
+export function updateAllCheckboxStyles(extensionEnabled) {
+    if (!extensionEnabled) {
+        themeCustomSettings.forEach(({ type, varId }) => {
+            if (type === 'checkbox') {
+                checkboxCssVersions.set(varId, (checkboxCssVersions.get(varId) || 0) + 1);
+            }
+        });
+        document.querySelectorAll('style[id^="css-block-"]').forEach((styleElement) => {
+            styleElement.textContent = '';
+        });
+        return;
+    }
+
+    const context = SillyTavern.getContext();
+    const settings = getExtensionSettings(context);
+    if (!settings) return;
+
+    themeCustomSettings.forEach((setting) => {
+        if (setting.type === 'checkbox') {
+            void applyCheckboxCss(setting, settings, extensionEnabled && settings[setting.varId] === true);
+        }
+    });
+}
+
 function createCheckbox(container, setting, settings) {
     const context = SillyTavern.getContext();
-    const { varId, default: defaultValue, displayText, cssBlock, cssFile, description } = setting;
+    const { varId, default: defaultValue, displayText, description } = setting;
 
     const checkboxContainer = document.createElement('div');
     checkboxContainer.classList.add('checkbox-container');
@@ -566,59 +635,11 @@ function createCheckbox(container, setting, settings) {
     checkbox.checked = settings[varId] === true;
     checkbox.style.marginLeft = 'auto';
 
-    let styleElement = document.getElementById(`css-block-${varId}`);
-    if (!styleElement) {
-        styleElement = document.createElement('style');
-        styleElement.id = `css-block-${varId}`;
-        document.head.appendChild(styleElement);
-    }
-
-    function updateInlineCssBlock(enabled) {
-        if (!settings.enabled) {
-            styleElement.textContent = '';
-            return;
-        }
-
-        if (styleElement && cssBlock) {
-            styleElement.textContent = enabled ? cssBlock : '';
-        }
-    }
-
-    async function loadExternalCss(enabled) {
-        if (!settings.enabled || !enabled || !cssFile) {
-            if (styleElement) {
-                styleElement.textContent = '';
-            }
-            return;
-        }
-
-        try {
-            const cssFilePath = `${EXTENSION_FOLDER_PATH}/css/${cssFile}`;
-            const response = await fetch(cssFilePath);
-            if (response.ok) {
-                const cssText = await response.text();
-                if (styleElement) {
-                    styleElement.textContent = cssText;
-                }
-            }
-        } catch {
-            // Silently ignore CSS loading errors
-        }
-    }
-
-    async function applyCss(enabled) {
-        if (cssFile) {
-            await loadExternalCss(enabled);
-        } else if (cssBlock) {
-            updateInlineCssBlock(enabled);
-        }
-    }
-
-    void applyCss(checkbox.checked);
+    void applyCheckboxCss(setting, settings, checkbox.checked);
 
     checkbox.addEventListener('change', () => {
         commitSettingChange(settings, context, varId, checkbox.checked, (changedVarId, enabled) => {
-            void applyCss(enabled);
+            void applyCheckboxCss(setting, settings, enabled);
             applyThemeSettingFn(changedVarId, enabled ? 'true' : 'false');
         });
     });
@@ -659,10 +680,11 @@ export function updateSettingsUI() {
                 updateSelectUI(varId, value);
                 break;
             case 'text':
+            case 'textarea':
                 updateTextInputUI(varId, value);
                 break;
             case 'checkbox':
-                updateCheckboxUI(varId, value);
+                updateCheckboxUI(varId, value, settings);
                 break;
         }
     });
@@ -676,10 +698,9 @@ export function updateColorPickerUI(varId, value) {
 
     const colorPicker = document.querySelector(`#cts-${varId}-color`);
     if (colorPicker) {
-        if (typeof colorPicker.setColor === 'function') {
-            colorPicker.setColor(value);
-        } else {
-            colorPicker.setAttribute('color', value);
+        const hexValue = rgbaToHex(value);
+        if (hexValue) {
+            colorPicker.value = hexValue;
         }
     }
 
@@ -746,11 +767,18 @@ export function updateTextInputUI(varId, value) {
     }
 }
 
-export function updateCheckboxUI(varId, value) {
+export function updateCheckboxUI(varId, value, settingsOverride) {
     const checkbox = document.querySelector(`#cts-checkbox-${varId}`);
     if (checkbox) {
         checkbox.checked = value === true;
     }
+
+    const setting = themeCustomSettings.find(({ varId: settingVarId }) => settingVarId === varId);
+    if (!setting) return;
+
+    const context = SillyTavern.getContext();
+    const settings = settingsOverride || getExtensionSettings(context);
+    void applyCheckboxCss(setting, settings, value === true);
 }
 
 function updateColorSliderThumb(varId, hexColor) {

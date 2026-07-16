@@ -24,6 +24,11 @@ export function initializeSlashCommands() {
 
     function switchChatStyle(styleValue) {
         try {
+            const currentSettings = getExtensionSettings(SillyTavern.getContext());
+            if (!currentSettings?.enabled) {
+                return t`Moonlit Echoes Theme is disabled`;
+            }
+
             const result = setChatStyle(styleValue);
             return t`Chat style switched to ${result.label}`;
         } catch (error) {

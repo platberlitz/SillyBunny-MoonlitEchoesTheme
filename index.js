@@ -4,7 +4,7 @@
  */
 
 // Global settings and constants
-import { EXTENSION_NAME, EXTENSION_ID, EXTENSION_FOLDER_PATH, THEME_VERSION, EXTENSION_REPOSITORY_URL } from './src/config/theme-info.js';
+import { EXTENSION_NAME, EXTENSION_ID, THEME_VERSION, EXTENSION_REPOSITORY_URL } from './src/config/theme-info.js';
 export { THEME_VERSION } from './src/config/theme-info.js';
 
 // Import required functions for drag functionality
@@ -17,21 +17,24 @@ import { initializeSlashCommands } from './src/services/slash-commands.js';
 import { initChatStyleIntegration, syncChatStyleEnabledState } from './src/services/chat-styles.js';
 import { initExtension } from './src/bootstrap/init-extension.js';
 import { installLifecycleHooks, registerDomReadyHandler } from './src/bootstrap/lifecycle-hooks.js';
-import { initControls, toggleSettingsPopout } from './src/ui/controls.js';
+import { clearActiveMessages, initControls } from './src/ui/controls.js';
 import {
     configurePresetManager,
     createPresetManagerUI,
-    initPresetManager,
     applyActivePreset,
 } from './src/ui/preset-manager.js';
-import { configureSettingsTabs, createTabbedSettingsUI } from './src/ui/settings-tabs.js';
+import {
+    addSettingToTabbedUI,
+    configureSettingsTabs,
+    createTabbedSettingsUI,
+} from './src/ui/settings-tabs.js';
 import {
     configureSettingsFactory,
-    createCustomSettingsUI,
     createSettingItem,
     updateSettingsUI,
     updateColorPickerUI,
     updateSelectUI,
+    updateAllCheckboxStyles,
     addModernCompactStyles,
 } from './src/ui/settings-factory.js';
 import {
@@ -178,19 +181,6 @@ function flushChatSurfaceLayout() {
  * Includes settings panel, chat style, color picker, and sidebar button
  */
 export function initExtensionUI() {
-    configurePresetManager({
-        settingsKey,
-        themeVersion: THEME_VERSION,
-        t,
-        themeCustomSettings,
-        applyThemeSetting,
-        applyAllThemeSettings,
-        updateSettingsUI,
-        updateColorPickerUI,
-        updateSelectUI,
-        updateThemeSelector,
-    });
-
     configureSettingsTabs({
         t,
         tabMappings,
@@ -199,13 +189,10 @@ export function initExtensionUI() {
         addModernCompactStyles,
     });
 
-    loadSettingsHTML().then(() => {
+    Promise.resolve().then(() => {
         renderExtensionSettings();
-        initChatDisplaySwitcher();
+        initChatStyleIntegration({ t });
         initAvatarInjector();
-
-        // Initialize preset manager
-        initPresetManager();
 
         // Apply active preset
         applyActivePreset();
@@ -215,9 +202,6 @@ export function initExtensionUI() {
 
         // Add modern compact styles
         addModernCompactStyles();
-
-        // Add theme version information
-        addThemeVersionInfo();
 
         // Integrate with theme selector
         integrateWithThemeSelector();
@@ -231,10 +215,11 @@ export function initExtensionUI() {
             t,
             dragElement,
             loadMovingUIState,
+            isMessageDetailsEnabled: () => {
+                const settings = getMoonlitSettings();
+                return settings?.enabled === true && settings?.enableMessageDetails === true;
+            },
         });
-
-        // Adds a button to the extensions dropdown menu
-        addExtensionMenuButton();
 
         // Initialize slash commands (only when enabled)
         initializeSlashCommands();
@@ -248,45 +233,6 @@ export function initExtensionUI() {
         }
     });
 
-}
-
-/**
- * Adds a button to the Extensions dropdown menu for Moonlit Echoes Theme
- * This function creates a menu item in SillyTavern's Extensions dropdown
- * that opens the theme settings popup when clicked.
- */
-function addExtensionMenuButton() {
-    // Select the Extensions dropdown menu
-    let $extensions_menu = $('#extensionsMenu');
-    if (!$extensions_menu.length) {
-        return;
-    }
-
-    // SillyBunny can re-run extension UI setup when shell surfaces refresh.
-    // Remove any previous Moonlit entry before adding the current one.
-    $extensions_menu
-        .children('[data-moonlit-extension-menu-button="true"], .moonlit-echoes-menu-button')
-        .remove();
-    $extensions_menu
-        .children()
-        .filter((_, element) => element.title === 'Open Moonlit Echoes Theme Settings' && element.textContent.trim() === 'Moonlit Echoes')
-        .remove();
-
-    // Create button element with moon icon and theme name
-    let $button = $(`
-    <div class="list-group-item flex-container flexGap5 interactable moonlit-echoes-menu-button" data-moonlit-extension-menu-button="true" title="Open Moonlit Echoes Theme Settings" data-i18n="[title]Open Moonlit Echoes Theme Settings" tabindex="0">
-        <i class="fa-solid fa-moon"></i>
-        <span>Moonlit Echoes</span>
-    </div>
-    `);
-
-    // Append to extensions menu
-    $button.appendTo($extensions_menu);
-
-    // Set click handler to toggle the settings popup
-    $button.click(() => {
-        toggleSettingsPopout();
-    });
 }
 
 /**
@@ -498,14 +444,6 @@ function addSlashCommandsTip(container) {
 }
 
 
-/**
-* Handle Moonlit Echoes preset import
-* @param {Object} jsonData - Imported JSON data
-*/
-/**
-* Update theme selector
-* @param {string} presetName - Preset name
-*/
 function updateThemeSelector(presetName) {
     const themeSelector = document.getElementById('themes');
     if (!themeSelector) return;
@@ -526,22 +464,6 @@ function updateThemeSelector(presetName) {
     if (optionExists) {
         themeSelector.dispatchEvent(new Event('change'));
     }
-}
-
-/**
-* Settings UI initialization function - no longer requires external HTML file
-* @returns {Promise} Promise for initialization completion
-*/
-function loadSettingsHTML() {
-return new Promise((resolve) => {
-    // Since all HTML is now integrated into JavaScript, no need to load from external sources
-    // Just return resolved Promise to continue the initialization flow
-
-    // If any initialization operations need to be performed here, can be added here
-
-    // Immediately resolve Promise
-    resolve();
-});
 }
 
 /**
@@ -613,6 +535,7 @@ export function toggleCss(shouldLoad) {
 
         syncChatStyleEnabledState(true);
     } else {
+        clearActiveMessages();
         if (shouldRefreshChatSurface) {
             // Neutralize Moonlit's mask before detaching its stylesheet so the
             // browser cannot retain a transparent composited chat layer.
@@ -639,7 +562,7 @@ export function toggleCss(shouldLoad) {
         if (existingHint) existingHint.remove();
 
         // Clear all checkbox styles
-        clearAllCheckboxStyles();
+        updateAllCheckboxStyles(false);
 
         if (shouldRefreshChatSurface) {
             flushChatSurfaceLayout();
@@ -663,48 +586,6 @@ function ensureChatStyleCss(baseUrl, cssVersion) {
     link.rel = 'stylesheet';
     link.href = cssUrl;
     document.head.append(link);
-}
-
-/**
- * Clear all CSS styles added by checkboxes
- */
-function clearAllCheckboxStyles() {
-    // Find all style elements created by checkboxes
-    document.querySelectorAll('style[id^="css-block-"]').forEach(element => {
-        element.textContent = '';
-    });
-}
-
-/**
- * Update all checkbox styles based on their current settings and extension state
- * @param {boolean} extensionEnabled - Whether the extension is enabled
- */
-function updateAllCheckboxStyles(extensionEnabled) {
-    if (!extensionEnabled) {
-        clearAllCheckboxStyles();
-        return;
-    }
-
-    // Get settings
-    const context = SillyTavern.getContext();
-    const settings = getExtensionSettings(context);
-
-    // Go through all checkbox settings and update their styles
-    themeCustomSettings.forEach(setting => {
-        if (setting.type === 'checkbox' && (setting.cssBlock || setting.cssFile)) {
-            const varId = setting.varId;
-            const enabled = settings[varId] === true;
-            const styleElement = document.getElementById(`css-block-${varId}`);
-
-            if (styleElement) {
-                if (setting.cssBlock && enabled) {
-                    styleElement.textContent = setting.cssBlock;
-                } else {
-                    styleElement.textContent = '';
-                }
-            }
-        }
-    });
 }
 
 /**
@@ -795,9 +676,6 @@ function renderExtensionSettings() {
         // Update hint display when enable status changes
         addThemeButtonsHint();
 
-        // Update custom chat styles when enabled status changes
-        updateCustomChatStyles();
-
         // Re-initialize slash commands based on enabled status
         if (settings.enabled) {
             initializeSlashCommands();
@@ -866,53 +744,6 @@ function renderExtensionSettings() {
     });
 }
 
-/**
- * Update custom chat styles based on extension enabled status
- */
-function updateCustomChatStyles() {
-    // No-op: options are now permanent; nothing to add/remove on enable toggle
-}
-
-/**
- * Remove custom chat styles when theme is disabled
- */
-function removeCustomChatStyles() {
-    // Intentionally empty: we no longer remove options when the theme is disabled
-}
-
-/**
- * Create tabbed settings UI with state persistence - Updated tab name
- * @param {HTMLElement} container - Container to add tabbed settings
- * @param {Object} settings - Current settings object
- */
-
-/**
- * Populate tab content with sections and settings
- * Modified to support always-expanded first sections
- * @param {Array} tabs - Tab configuration objects
- * @param {HTMLElement} tabContents - Container for tab content
- * @param {Object} settings - Current settings object
- * @param {boolean} firstSectionAlwaysExpanded - Whether to keep first section expanded
- */
-
-/**
- * Enhanced populateTabContent without expand/collapse all buttons
- * @param {Array} tabs - Tab configuration objects
- * @param {HTMLElement} tabContents - Container for tab content
- * @param {Object} settings - Current settings object
- */
-
-/**
- * Save section expand/collapse state to localStorage
- * @param {string} category - Category ID
- * @param {boolean} isExpanded - Whether section is expanded
- */
-
-/**
-* Create preset manager UI
-* @param {HTMLElement} container - Container to add preset manager
-* @param {Object} settings - Current settings object
-*/
 /**
  * Add theme creator information to settings panel
  * @param {HTMLElement} [container] - Optional container, uses default settings container if not provided
@@ -986,15 +817,6 @@ container.appendChild(versionContainer);
 }
 
 /**
- * Initialize chat appearance switcher - only when theme is enabled
- * Handle switching between different chat styles
- */
-function initChatDisplaySwitcher() {
-    initChatStyleIntegration({ t });
-}
-
-
-/**
 * Apply single theme setting
 * @param {string} varId - CSS variable ID
 * @param {string} value - Setting value
@@ -1050,14 +872,6 @@ document.addEventListener('themeSettingChanged', (ev) => {
 });
 
 /**
- * Convert RGBA to HEX - enhanced version
- * Support more formats and better error handling
- * @param {string} rgba - RGBA color string
- * @returns {string|null} HEX color string or null
- */
-
-
-/**
 * Dynamically add a new custom setting
 * Use this function to add new settings at runtime
 * @param {Object} settingConfig - Setting configuration object
@@ -1089,30 +903,25 @@ export function addCustomSetting(settingConfig) {
     // Save settings
     saveExtensionSettings(context);
 
-    // Re-render settings panel
-    const settingsContainer = document.querySelector(`#${settingsKey}-drawer .inline-drawer-content`);
-    if (settingsContainer) {
-        // Clear existing settings (keep enable switch)
-        const enabledCheckbox = settingsContainer.querySelector(`#${settingsKey}-enabled`).parentElement;
-        const separator = settingsContainer.querySelector('hr');
-
-        // Clear child elements
-        while (settingsContainer.lastChild) {
-            settingsContainer.removeChild(settingsContainer.lastChild);
-        }
-
-        // Re-add enable switch
-        settingsContainer.appendChild(enabledCheckbox);
-        settingsContainer.appendChild(separator);
-
-        // Recreate settings
-        createCustomSettingsUI(settingsContainer, settings);
-    }
+    addSettingToTabbedUI(settingConfig, settings);
 }
 
 configureSettingsFactory({
     applyThemeSetting,
     applyRawCustomCss,
+});
+
+configurePresetManager({
+    settingsKey,
+    themeVersion: THEME_VERSION,
+    t,
+    themeCustomSettings,
+    applyThemeSetting,
+    applyAllThemeSettings,
+    updateSettingsUI,
+    updateColorPickerUI,
+    updateSelectUI,
+    updateThemeSelector,
 });
 
 export { addModernCompactStyles };

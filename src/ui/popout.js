@@ -1,6 +1,7 @@
 let popoutVisible = false;
-let $popout = null;
-let $drawerContent = null;
+let popoutState = 'closed';
+let popoutSession = null;
+let transitionVersion = 0;
 
 let settingsKey = '';
 let dragElementFn = null;
@@ -45,18 +46,69 @@ export function togglePopout() {
  * Open the settings popout and move the drawer content inside it.
  */
 export function openPopout() {
-    if (popoutVisible) return;
+    if (popoutState === 'open' || popoutState === 'opening') return;
 
-    const $drawer = $(`#${settingsKey}-drawer`);
+    if (popoutState === 'closing' && popoutSession) {
+        startOpening(popoutSession);
+        return;
+    }
+
+    if (!settingsKey) return;
+
+    const drawerElement = document.getElementById(`${settingsKey}-drawer`);
+    const $drawer = $(drawerElement);
     const $drawerHeader = $drawer.find('.inline-drawer-header');
     const $drawerContentElement = $drawer.find('.inline-drawer-content');
+    const $movingDivs = $('#movingDivs');
+    const reservedElements = document.querySelectorAll(
+        '#moonlit_echoes_popout, #moonlitEchoesPopoutHeader, #moonlit_echoes_content_container',
+    );
+    if (
+        $drawer.length !== 1 ||
+        $drawerHeader.length !== 1 ||
+        $drawerContentElement.length !== 1 ||
+        $movingDivs.length !== 1 ||
+        reservedElements.length > 0
+    ) {
+        return;
+    }
+
+    const setupVersion = ++transitionVersion;
+    popoutState = 'opening';
     const isCollapsed = !$drawerContentElement.hasClass('open');
 
     if (isCollapsed) {
-        $drawerHeader.trigger('click');
+        try {
+            $drawerHeader.trigger('click');
+        } catch (error) {
+            if (popoutState === 'opening' && transitionVersion === setupVersion) {
+                popoutState = 'closed';
+            }
+            throw error;
+        }
     }
 
-    $popout = $(`
+    if (
+        popoutState !== 'opening' ||
+        transitionVersion !== setupVersion ||
+        document.getElementById(`${settingsKey}-drawer`) !== drawerElement ||
+        !$drawerHeader[0].isConnected ||
+        !$drawerContentElement[0].isConnected ||
+        $drawer.find('.inline-drawer-header').length !== 1 ||
+        $drawer.find('.inline-drawer-header')[0] !== $drawerHeader[0] ||
+        $drawer.find('.inline-drawer-content').length !== 1 ||
+        $drawer.find('.inline-drawer-content')[0] !== $drawerContentElement[0] ||
+        document.querySelectorAll('#movingDivs').length !== 1 ||
+        document.getElementById('movingDivs') !== $movingDivs[0] ||
+        document.querySelector(
+            '#moonlit_echoes_popout, #moonlitEchoesPopoutHeader, #moonlit_echoes_content_container',
+        )
+    ) {
+        popoutState = 'closed';
+        return;
+    }
+
+    const $popout = $(`
         <div id="moonlit_echoes_popout" class="draggable" style="display: none;">
             <div class="panelControlBar flex-container" id="moonlitEchoesPopoutHeader">
                 <div class="fa-solid fa-moon" style="margin-right: 10px;"></div>
@@ -68,13 +120,23 @@ export function openPopout() {
             <div id="moonlit_echoes_content_container"></div>
         </div>
     `);
+    const contentParent = $drawerContentElement[0].parentNode;
+    const contentAnchor = document.createComment('moonlit-echoes-drawer-content');
+    $drawerContentElement[0].before(contentAnchor);
 
-    $('#movingDivs').append($popout);
+    $movingDivs.append($popout);
 
     $drawerContentElement.removeClass('open').detach()
         .appendTo($popout.find('#moonlit_echoes_content_container'));
     $drawerContentElement.addClass('open').show();
-    $drawerContent = $drawerContentElement;
+    const session = {
+        $popout,
+        $drawer,
+        $drawerContent: $drawerContentElement,
+        contentParent,
+        contentAnchor,
+    };
+    popoutSession = session;
 
     if (typeof loadMovingUIStateFn === 'function') {
         try {
@@ -82,6 +144,10 @@ export function openPopout() {
         } catch (error) {
             // Silent error handling to avoid breaking UI.
         }
+    }
+    if (!isCurrentSetup(session, setupVersion)) {
+        cleanUpInterruptedSetup(session, setupVersion);
+        return;
     }
 
     if (typeof dragElementFn === 'function') {
@@ -91,48 +157,128 @@ export function openPopout() {
             // Silent error handling to avoid breaking UI.
         }
     }
+    if (!isCurrentSetup(session, setupVersion)) {
+        cleanUpInterruptedSetup(session, setupVersion);
+        return;
+    }
 
-    $popout.find('.dragClose').on('click', () => closePopout());
-
-    $popout.fadeIn(250);
-    setVisibility(true);
-
-    $(document).on('keydown.moonlit_popout', (event) => {
-        if (event.key === 'Escape') {
+    $popout.find('.dragClose').on('click', () => {
+        if (popoutSession === session) {
             closePopout();
         }
     });
+
+    startOpening(session);
+}
+
+function isCurrentSetup(session, version) {
+    return popoutSession === session &&
+        popoutState === 'opening' &&
+        transitionVersion === version &&
+        session.$popout[0].isConnected &&
+        session.$drawerContent[0].isConnected;
+}
+
+function cleanUpInterruptedSetup(session, version) {
+    if (
+        popoutSession !== session ||
+        popoutState !== 'opening' ||
+        transitionVersion !== version
+    ) {
+        return;
+    }
+
+    restoreDrawerContent(session);
+    session.$popout.remove();
+    popoutSession = null;
+    popoutState = 'closed';
 }
 
 /**
  * Close the settings popout and return the drawer content to its original location.
  */
 export function closePopout() {
-    if (!popoutVisible || !$popout) return;
+    if (popoutState === 'closed' || popoutState === 'closing' || !popoutSession) return;
 
-    const $currentPopout = $popout;
-    const $currentDrawerContent = $drawerContent;
+    const session = popoutSession;
+    const version = ++transitionVersion;
+    popoutState = 'closing';
 
-    $currentPopout.fadeOut(250, () => {
-        const $drawer = $(`#${settingsKey}-drawer`);
+    $(document).off('keydown.moonlit_popout');
+    setVisibility(false);
+    if (
+        popoutSession !== session ||
+        popoutState !== 'closing' ||
+        transitionVersion !== version
+    ) {
+        return;
+    }
 
-        if ($currentDrawerContent) {
-            $currentDrawerContent.detach().appendTo($drawer);
-            $currentDrawerContent.addClass('open').show();
+    session.$popout.stop(true, false).fadeOut(250).promise('fx').always(() => {
+        if (
+            popoutSession !== session ||
+            popoutState !== 'closing' ||
+            transitionVersion !== version
+        ) {
+            return;
         }
 
-        $currentPopout.remove();
+        restoreDrawerContent(session);
+        session.$popout.remove();
+        popoutSession = null;
+        popoutState = 'closed';
+    });
+}
 
-        if ($popout === $currentPopout) {
-            $popout = null;
+function startOpening(session) {
+    const version = ++transitionVersion;
+    popoutState = 'opening';
+
+    $(document)
+        .off('keydown.moonlit_popout')
+        .on('keydown.moonlit_popout', (event) => {
+            if (event.key === 'Escape') {
+                closePopout();
+            }
+        });
+    setVisibility(true);
+    if (
+        popoutSession !== session ||
+        popoutState !== 'opening' ||
+        transitionVersion !== version
+    ) {
+        return;
+    }
+
+    session.$popout.stop(true, false).fadeIn(250).promise('fx').always(() => {
+        if (
+            popoutSession === session &&
+            popoutState === 'opening' &&
+            transitionVersion === version
+        ) {
+            session.$popout.css('opacity', '').show();
+            popoutState = 'open';
         }
     });
+}
 
-    setVisibility(false);
-    $(document).off('keydown.moonlit_popout');
+function restoreDrawerContent(session) {
+    const contentElement = session.$drawerContent[0];
+    const anchorParent = session.contentAnchor.parentNode;
+    session.$drawerContent.detach();
+
+    if (anchorParent) {
+        anchorParent.insertBefore(contentElement, session.contentAnchor);
+        session.contentAnchor.remove();
+    } else {
+        session.contentParent.append(contentElement);
+    }
+
+    session.$drawerContent.addClass('open').show();
 }
 
 function setVisibility(visible) {
+    if (popoutVisible === visible) return;
     popoutVisible = visible;
 
     if (typeof visibilityChangeCallback === 'function') {
@@ -141,8 +287,5 @@ function setVisibility(visible) {
         } catch (error) {
             // Silent error handling to avoid interrupting UI flow.
         }
-    }
-    if (!visible) {
-        $drawerContent = null;
     }
 }

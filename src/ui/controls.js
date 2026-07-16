@@ -5,6 +5,7 @@ let translateTag = null;
 let sidebarStylesInjected = false;
 let drawerHeaderFixRegistered = false;
 let messageClickHandlersInitialized = false;
+let isMessageDetailsEnabled = () => false;
 
 /**
  * Initialize Moonlit Echoes UI controls.
@@ -13,10 +14,12 @@ let messageClickHandlersInitialized = false;
  * @param {Function} options.t
  * @param {Function} options.dragElement
  * @param {Function} options.loadMovingUIState
+ * @param {Function} options.isMessageDetailsEnabled
  */
 export function initControls(options = {}) {
     currentSettingsKey = options.settingsKey || currentSettingsKey;
     translateTag = options.t || translateTag;
+    isMessageDetailsEnabled = options.isMessageDetailsEnabled || isMessageDetailsEnabled;
 
     configurePopout({
         settingsKey: currentSettingsKey,
@@ -29,9 +32,36 @@ export function initControls(options = {}) {
     addSettingsPopoutButton();
     registerDrawerHeaderFix();
     ensureMessageClickHandlers();
+    addExtensionMenuButton();
 }
 
 export { togglePopout as toggleSettingsPopout } from './popout.js';
+
+function addExtensionMenuButton() {
+    const $extensionsMenu = $('#extensionsMenu');
+    if (!$extensionsMenu.length) {
+        return;
+    }
+
+    $extensionsMenu
+        .children('[data-moonlit-extension-menu-button="true"], .moonlit-echoes-menu-button')
+        .remove();
+    $extensionsMenu
+        .children()
+        .filter((_, element) => element.title === 'Open Moonlit Echoes Theme Settings'
+            && element.textContent.trim() === 'Moonlit Echoes')
+        .remove();
+
+    const $button = $(`
+        <div class="list-group-item flex-container flexGap5 interactable moonlit-echoes-menu-button" data-moonlit-extension-menu-button="true" title="Open Moonlit Echoes Theme Settings" data-i18n="[title]Open Moonlit Echoes Theme Settings" tabindex="0">
+            <i class="fa-solid fa-moon"></i>
+            <span>Moonlit Echoes</span>
+        </div>
+    `);
+
+    $button.appendTo($extensionsMenu);
+    $button.on('click', togglePopout);
+}
 
 function initializeSidebarButton() {
     if ($('#moonlit_sidebar_button').length === 0) {
@@ -258,37 +288,65 @@ function ensureMessageClickHandlers() {
 
 function initMessageClickHandlers() {
     document.addEventListener('click', onDocumentClickForMessageToggles);
+    document.addEventListener('themeSettingChanged', onThemeSettingChanged);
 }
 
 function onDocumentClickForMessageToggles(event) {
-    const messageElement = event.target.closest('.mes');
+    if (!getMessageDetailsEnabledState()) {
+        clearActiveMessages();
+        return;
+    }
+
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    const messageElement = target.closest('.mes');
 
     if (messageElement) {
-        const isClickInsideDetails =
-            event.target.closest('.mesIDDisplay') ||
-            event.target.closest('.mes_timer') ||
-            event.target.closest('.tokenCounterDisplay');
-
-        const isMessageActionButton =
-            event.target.closest('.extraMesButtonsHint') ||
-            event.target.closest('.mes_edit') ||
-            event.target.closest('.mes_edit_buttons');
-
-        if (event.target.tagName === 'A' || event.target.tagName === 'BUTTON' || isMessageActionButton) {
-            if (isMessageActionButton) {
-                messageElement.classList.add('active-message');
-            }
+        const isMessageAction = target.closest(
+            '.extraMesButtonsHint, .extraMesButtons, .mes_button, .mes_edit, .mes_edit_buttons',
+        );
+        if (isMessageAction) {
+            messageElement.classList.add('active-message');
             return;
         }
 
-        if (!isClickInsideDetails) {
-            messageElement.classList.toggle('active-message');
-        }
+        const isInteractiveElement = target.closest(
+            'a, button, input, textarea, select, [contenteditable="true"]',
+        );
+        const isClickInsideDetails = target.closest(
+            '.ch_name, .mesIDDisplay, .mes_timer, .tokenCounterDisplay, .mes_reasoning_details',
+        );
+        if (isInteractiveElement || isClickInsideDetails) return;
+
+        messageElement.classList.toggle('active-message');
     } else {
-        document.querySelectorAll('.mes.active-message').forEach((activeMessage) => {
-            activeMessage.classList.remove('active-message');
-        });
+        clearActiveMessages();
     }
+}
+
+function onThemeSettingChanged(event) {
+    const { varId, value } = event.detail || {};
+    if (
+        varId === 'enableMessageDetails' &&
+        (value === false || value === 'false' || !getMessageDetailsEnabledState())
+    ) {
+        clearActiveMessages();
+    }
+}
+
+function getMessageDetailsEnabledState() {
+    try {
+        return isMessageDetailsEnabled() === true;
+    } catch {
+        return false;
+    }
+}
+
+export function clearActiveMessages() {
+    document.querySelectorAll('.mes.active-message').forEach((activeMessage) => {
+        activeMessage.classList.remove('active-message');
+    });
 }
 
 function updateSidebarButtonState() {

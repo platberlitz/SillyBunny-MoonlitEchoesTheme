@@ -1,7 +1,13 @@
 import { themeCustomSettings } from '../config/theme-settings.js';
-import { isBuiltInPresetName, resolveActivePresetName } from '../config/default-settings.js';
-import { getSettings as getExtensionSettings, saveSettings as saveExtensionSettings } from '../services/settings-service.js';
-import { loadPreset, applyPresetToSettings, syncMoonlitPresetsWithThemeList } from '../ui/preset-manager.js';
+import { getSettings as getExtensionSettings } from '../services/settings-service.js';
+import {
+    deletePresetSnapshot,
+    importPresetSnapshot,
+    loadPreset,
+    resolveStoredPresetName,
+    syncMoonlitPresetsWithThemeList,
+    upsertPresetSnapshot,
+} from '../ui/preset-manager.js';
 import { initFormSheldHeightMonitor } from '../core/observers.js';
 
 const domReadyHandlers = new Set();
@@ -94,18 +100,7 @@ const moonlitEchoesApi = {
         },
 
         create: function(name, settingsObj) {
-            const context = SillyTavern.getContext();
-            const settings = getExtensionSettings(context);
-
-            if (!name || typeof name !== 'string') {
-                return false;
-            }
-
-            settings.presets[name] = settingsObj || {};
-            saveExtensionSettings(context);
-            syncMoonlitPresetsWithThemeList();
-
-            return true;
+            return Boolean(upsertPresetSnapshot(name, settingsObj ?? {}));
         },
 
         load: function(name) {
@@ -115,75 +110,41 @@ const moonlitEchoesApi = {
         update: function(name, settingsObj) {
             const context = SillyTavern.getContext();
             const settings = getExtensionSettings(context);
+            const presetName = resolveStoredPresetName(settings?.presets, name);
 
-            if (!settings.presets[name]) {
+            if (!presetName || !Object.hasOwn(settings.presets || {}, presetName)) {
                 return false;
             }
 
-            settings.presets[name] = settingsObj || settings.presets[name];
-            saveExtensionSettings(context);
-
-            return true;
+            return Boolean(upsertPresetSnapshot(
+                presetName,
+                settingsObj ?? settings.presets[presetName],
+            ));
         },
 
         delete: function(name) {
-            const context = SillyTavern.getContext();
-            const settings = getExtensionSettings(context);
-
-            if (isBuiltInPresetName(name)) {
-                return false;
-            }
-
-            if (!settings.presets[name]) {
-                return false;
-            }
-
-            if (Object.keys(settings.presets).length <= 1) {
-                return false;
-            }
-
-            const previousActivePreset = settings.activePreset;
-            delete settings.presets[name];
-            settings.activePreset = resolveActivePresetName(settings.presets, previousActivePreset);
-            if (settings.activePreset !== previousActivePreset) {
-                applyPresetToSettings(settings.activePreset);
-            }
-            saveExtensionSettings(context);
-            syncMoonlitPresetsWithThemeList();
-
-            return true;
+            return deletePresetSnapshot(name);
         },
 
         export: function(name) {
             const context = SillyTavern.getContext();
             const settings = getExtensionSettings(context);
+            const presetName = resolveStoredPresetName(settings?.presets, name);
 
-            if (!settings.presets[name]) {
+            if (!presetName) {
                 return null;
             }
 
             return {
                 moonlitEchoesPreset: true,
                 presetVersion: themeVersion,
-                presetName: name,
-                settings: settings.presets[name]
+                presetName,
+                settings: settings.presets[presetName]
             };
         },
 
         import: function(jsonData) {
-            if (!jsonData || !jsonData.moonlitEchoesPreset || !jsonData.presetName || !jsonData.settings) {
-                return false;
-            }
-
-            const context = SillyTavern.getContext();
-            const settings = getExtensionSettings(context);
-            const presetName = jsonData.presetName;
-
-            settings.presets[presetName] = jsonData.settings;
-            saveExtensionSettings(context);
-            syncMoonlitPresetsWithThemeList();
-
-            return true;
+            return Boolean(importPresetSnapshot(jsonData, { activate: false }));
         }
     }
 };
