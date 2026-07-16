@@ -4,7 +4,6 @@ let currentSettingsKey = '';
 let translateTag = null;
 let sidebarStylesInjected = false;
 let drawerHeaderFixRegistered = false;
-let messageDetailsInitialized = false;
 let messageClickHandlersInitialized = false;
 
 /**
@@ -29,7 +28,6 @@ export function initControls(options = {}) {
     initializeSidebarButton();
     addSettingsPopoutButton();
     registerDrawerHeaderFix();
-    ensureMessageDetailsSystem();
     ensureMessageClickHandlers();
 }
 
@@ -252,71 +250,14 @@ function fixDrawerHeaderLayout(settingsKey) {
     document.head.appendChild(styleElement);
 }
 
-function ensureMessageDetailsSystem() {
-    if (messageDetailsInitialized) return;
-    messageDetailsInitialized = true;
-
-    const init = () => {
-        initMessageDetailsSystem();
-    };
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init, { once: true });
-    } else {
-        init();
-    }
-}
-
 function ensureMessageClickHandlers() {
     if (messageClickHandlersInitialized) return;
     initMessageClickHandlers();
     messageClickHandlersInitialized = true;
 }
 
-function initMessageDetailsSystem() {
-    const messageElements = document.querySelectorAll('.mes');
-
-    messageElements.forEach((message) => {
-        message.addEventListener('click', function onMessageClick(event) {
-            const isClickInsideDetails =
-                event.target.closest('.ch_name') ||
-                event.target.closest('.mesIDDisplay') ||
-                event.target.closest('.mes_timer') ||
-                event.target.closest('.tokenCounterDisplay') ||
-                event.target.closest('.mes_reasoning_details');
-
-            if (!isClickInsideDetails) {
-                this.classList.toggle('show-details');
-
-                if (this.classList.contains('show-details')) {
-                    messageElements.forEach((otherMessage) => {
-                        if (otherMessage !== this) {
-                            otherMessage.classList.remove('show-details');
-                        }
-                    });
-                }
-            }
-        });
-
-        message.addEventListener('dblclick', function onMessageDoubleClick(event) {
-            event.preventDefault();
-            this.classList.remove('show-details');
-        });
-    });
-
-    document.addEventListener('click', onDocumentClickForMessageDetails);
-}
-
 function initMessageClickHandlers() {
     document.addEventListener('click', onDocumentClickForMessageToggles);
-}
-
-function onDocumentClickForMessageDetails(event) {
-    if (!event.target.closest('.mes')) {
-        document.querySelectorAll('.mes.show-details').forEach((message) => {
-            message.classList.remove('show-details');
-        });
-    }
 }
 
 function onDocumentClickForMessageToggles(event) {
