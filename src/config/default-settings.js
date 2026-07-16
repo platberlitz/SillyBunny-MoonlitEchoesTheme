@@ -4,6 +4,18 @@ import {
     themeCustomSettings,
 } from './theme-settings.js';
 
+export const BUILT_IN_PRESET_NAME = 'Moonlit Echoes - by Rivelle';
+const LEGACY_BUILT_IN_PRESET_NAMES = new Set(['Default', 'Moonlit Echoes']);
+
+export function isBuiltInPresetName(name) {
+    return name === BUILT_IN_PRESET_NAME || LEGACY_BUILT_IN_PRESET_NAMES.has(name);
+}
+
+export function resolveActivePresetName(presets, activePreset) {
+    const presetNames = Object.keys(presets || {});
+    return presetNames.includes(activePreset) ? activePreset : presetNames[0] || null;
+}
+
 /**
  * Generate default settings snapshot used for initial bootstrapping.
  * This mirrors the original inline logic so existing behaviour stays the same.
@@ -14,14 +26,14 @@ function generateDefaultSettings() {
         useOriginalAvatarImages: false,
         chatStyle: '',
         presets: {
-            "Moonlit Echoes - by Rivelle": {}
+            [BUILT_IN_PRESET_NAME]: {}
         },
-        activePreset: "Moonlit Echoes - by Rivelle"
+        activePreset: BUILT_IN_PRESET_NAME
     };
 
     themeCustomSettings.forEach((setting) => {
         settings[setting.varId] = setting.default;
-        settings.presets["Moonlit Echoes - by Rivelle"][setting.varId] = setting.default;
+        settings.presets[BUILT_IN_PRESET_NAME][setting.varId] = setting.default;
     });
 
     return Object.freeze(settings);
@@ -51,14 +63,14 @@ export function ensureSettingsStructure(settings) {
     }
 
     if (Object.keys(settings.presets).length === 0) {
-        settings.presets["Moonlit Echoes - by Rivelle"] = {};
+        settings.presets[BUILT_IN_PRESET_NAME] = {};
 
         themeCustomSettings.forEach((setting) => {
             const { varId } = setting;
             if (settings[varId] !== undefined) {
-                settings.presets["Moonlit Echoes - by Rivelle"][varId] = settings[varId];
+                settings.presets[BUILT_IN_PRESET_NAME][varId] = settings[varId];
             } else {
-                settings.presets["Moonlit Echoes - by Rivelle"][varId] = setting.default;
+                settings.presets[BUILT_IN_PRESET_NAME][varId] = setting.default;
             }
         });
     }
@@ -79,20 +91,17 @@ export function ensureSettingsStructure(settings) {
         });
     });
 
-    if (!settings.activePreset || !settings.presets[settings.activePreset]) {
-        const firstPreset = Object.keys(settings.presets)[0] || "Moonlit Echoes - by Rivelle";
-        settings.activePreset = firstPreset;
-    }
+    settings.activePreset = resolveActivePresetName(settings.presets, settings.activePreset);
 
     if (settings.presets["Moonlit Echoes"]) {
-        if (!settings.presets["Moonlit Echoes - by Rivelle"]) {
-            settings.presets["Moonlit Echoes - by Rivelle"] = settings.presets["Moonlit Echoes"];
+        if (!settings.presets[BUILT_IN_PRESET_NAME]) {
+            settings.presets[BUILT_IN_PRESET_NAME] = settings.presets["Moonlit Echoes"];
         }
 
         delete settings.presets["Moonlit Echoes"];
 
         if (settings.activePreset === "Moonlit Echoes") {
-            settings.activePreset = "Moonlit Echoes - by Rivelle";
+            settings.activePreset = BUILT_IN_PRESET_NAME;
         }
     }
 

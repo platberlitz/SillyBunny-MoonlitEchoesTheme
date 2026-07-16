@@ -1,4 +1,9 @@
 import { themeCustomSettings as defaultThemeCustomSettings } from '../config/theme-settings.js';
+import {
+    BUILT_IN_PRESET_NAME,
+    isBuiltInPresetName,
+    resolveActivePresetName,
+} from '../config/default-settings.js';
 
 const defaultTranslate = (strings, ...values) => strings.reduce((result, part, index) => {
     const value = index < values.length ? values[index] : '';
@@ -65,7 +70,7 @@ export function createPresetManagerUI(container, settingsOverride) {
     presetSelector.classList.add('moonlit-preset-selector');
     presetSelector.style.width = '100%';
 
-    const presets = settings.presets || { Default: {} };
+    const presets = settings.presets || { [BUILT_IN_PRESET_NAME]: {} };
     for (const presetName in presets) {
         const option = document.createElement('option');
         option.value = presetName;
@@ -229,8 +234,8 @@ export function updateCurrentPreset() {
 
     const presetName = settings.activePreset;
 
-    if (presetName === 'Default' && Object.keys(settings.presets).length > 1) {
-        if (!confirm(managerConfig.t`Are you sure you want to update the Default preset? This will overwrite the original settings.`)) {
+    if (isBuiltInPresetName(presetName) && Object.keys(settings.presets).length > 1) {
+        if (!confirm(managerConfig.t`Are you sure you want to update the built-in preset? This will overwrite the original settings.`)) {
             return;
         }
     }
@@ -308,7 +313,7 @@ export function deleteCurrentPreset() {
         return;
     }
 
-    if (presetName === 'Moonlit Echoes') {
+    if (isBuiltInPresetName(presetName)) {
         toastr.error(managerConfig.t`Cannot delete the Moonlit Echoes theme preset`);
         return;
     }
@@ -332,9 +337,9 @@ export function deleteCurrentPreset() {
             }
 
             delete settings.presets[presetName];
-            settings.activePreset = 'Default';
+            settings.activePreset = resolveActivePresetName(settings.presets, settings.activePreset);
 
-            applyPresetToSettings('Default');
+            applyPresetToSettings(settings.activePreset);
             updatePresetSelector();
             syncMoonlitPresetsWithThemeList();
             context.saveSettingsDebounced();
@@ -364,10 +369,8 @@ export function applyActivePreset() {
     const { settings } = getContextAndSettings();
     if (!settings) return;
 
-    if (!settings.activePreset || !settings.presets[settings.activePreset]) {
-        const firstPreset = Object.keys(settings.presets || {})[0] || 'Default';
-        settings.activePreset = firstPreset;
-    }
+    settings.activePreset = resolveActivePresetName(settings.presets, settings.activePreset);
+    if (!settings.activePreset) return;
 
     applyPresetToSettings(settings.activePreset);
 }

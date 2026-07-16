@@ -1,4 +1,5 @@
 import { themeCustomSettings } from '../config/theme-settings.js';
+import { isBuiltInPresetName, resolveActivePresetName } from '../config/default-settings.js';
 import { getSettings as getExtensionSettings, saveSettings as saveExtensionSettings } from '../services/settings-service.js';
 import { loadPreset, applyPresetToSettings, syncMoonlitPresetsWithThemeList } from '../ui/preset-manager.js';
 import { initFormSheldHeightMonitor } from '../core/observers.js';
@@ -129,7 +130,7 @@ const moonlitEchoesApi = {
             const context = SillyTavern.getContext();
             const settings = getExtensionSettings(context);
 
-            if (name === 'Default') {
+            if (isBuiltInPresetName(name)) {
                 return false;
             }
 
@@ -141,12 +142,12 @@ const moonlitEchoesApi = {
                 return false;
             }
 
-            if (settings.activePreset === name) {
-                settings.activePreset = 'Default';
-                applyPresetToSettings('Default');
-            }
-
+            const previousActivePreset = settings.activePreset;
             delete settings.presets[name];
+            settings.activePreset = resolveActivePresetName(settings.presets, previousActivePreset);
+            if (settings.activePreset !== previousActivePreset) {
+                applyPresetToSettings(settings.activePreset);
+            }
             saveExtensionSettings(context);
             syncMoonlitPresetsWithThemeList();
 
