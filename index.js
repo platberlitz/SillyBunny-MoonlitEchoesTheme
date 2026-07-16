@@ -16,7 +16,7 @@ import { settingsKey, getSettings as getExtensionSettings, saveSettings as saveE
 import { initializeSlashCommands } from './src/services/slash-commands.js';
 import { initChatStyleIntegration, syncChatStyleEnabledState } from './src/services/chat-styles.js';
 import { initExtension } from './src/bootstrap/init-extension.js';
-import { registerDomReadyHandler } from './src/bootstrap/lifecycle-hooks.js';
+import { installLifecycleHooks, registerDomReadyHandler } from './src/bootstrap/lifecycle-hooks.js';
 import { initControls, toggleSettingsPopout } from './src/ui/controls.js';
 import {
     configurePresetManager,
@@ -1116,6 +1116,14 @@ configureSettingsFactory({
 });
 
 export { addModernCompactStyles };
+
+installLifecycleHooks({
+    addModernCompactStyles,
+    applyAllThemeSettings,
+    addCustomSetting,
+    applyThemeSetting,
+    themeVersion: THEME_VERSION,
+});
 
 initExtension({
     initExtensionUI,

@@ -1,10 +1,15 @@
-import { addModernCompactStyles, applyAllThemeSettings, addCustomSetting, applyThemeSetting, THEME_VERSION } from '../../index.js';
 import { themeCustomSettings } from '../config/theme-settings.js';
 import { getSettings as getExtensionSettings, saveSettings as saveExtensionSettings } from '../services/settings-service.js';
 import { loadPreset, applyPresetToSettings, syncMoonlitPresetsWithThemeList } from '../ui/preset-manager.js';
 import { initFormSheldHeightMonitor } from '../core/observers.js';
 
 const domReadyHandlers = new Set();
+let lifecycleInstalled = false;
+let addModernCompactStyles;
+let applyAllThemeSettings;
+let addCustomSetting;
+let applyThemeSetting;
+let themeVersion;
 
 /**
  * Register a handler to run once the DOM is ready.
@@ -47,25 +52,12 @@ function runDomReadyHandlers() {
     }
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', runDomReadyHandlers, { once: true });
-} else {
-    // Defer to the next tick so circular imports finish initializing before handlers run
-    if (typeof queueMicrotask === 'function') {
-        queueMicrotask(runDomReadyHandlers);
-    } else {
-        setTimeout(runDomReadyHandlers, 0);
-    }
-}
-
 function initializeThemeColorOnDemand() {
     applyAllThemeSettings();
     syncMoonlitPresetsWithThemeList();
 }
 
-window.initializeThemeColorOnDemand = initializeThemeColorOnDemand;
-
-window.MoonlitEchoesTheme = {
+const moonlitEchoesApi = {
     init: function() {
         applyAllThemeSettings();
         initializeThemeColorOnDemand();
@@ -171,7 +163,7 @@ window.MoonlitEchoesTheme = {
 
             return {
                 moonlitEchoesPreset: true,
-                presetVersion: THEME_VERSION,
+                presetVersion: themeVersion,
                 presetName: name,
                 settings: settings.presets[name]
             };
@@ -195,4 +187,36 @@ window.MoonlitEchoesTheme = {
     }
 };
 
-window.formSheldHeightController = initFormSheldHeightMonitor();
+/**
+ * Install lifecycle hooks and public APIs after the entry point is initialized.
+ * @param {object} dependencies - Runtime dependencies provided by the entry point.
+ */
+export function installLifecycleHooks(dependencies) {
+    if (lifecycleInstalled) return;
+
+    ({
+        addModernCompactStyles,
+        applyAllThemeSettings,
+        addCustomSetting,
+        applyThemeSetting,
+        themeVersion,
+    } = dependencies);
+    lifecycleInstalled = true;
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', runDomReadyHandlers, { once: true });
+    } else {
+        // Preserve deferred follow-up work until entry point initialization completes.
+        if (typeof queueMicrotask === 'function') {
+            queueMicrotask(runDomReadyHandlers);
+        } else {
+            setTimeout(runDomReadyHandlers, 0);
+        }
+    }
+
+    moonlitEchoesApi.addSetting = addCustomSetting;
+    moonlitEchoesApi.applySetting = applyThemeSetting;
+    window.initializeThemeColorOnDemand = initializeThemeColorOnDemand;
+    window.MoonlitEchoesTheme = moonlitEchoesApi;
+    window.formSheldHeightController = initFormSheldHeightMonitor();
+}
