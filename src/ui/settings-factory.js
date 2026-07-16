@@ -28,6 +28,12 @@ function syncAndSaveSettings(settings, context) {
     saveExtensionSettings(context);
 }
 
+function commitSettingChange(settings, context, varId, value, applyChange = applyThemeSettingFn) {
+    settings[varId] = value;
+    applyChange?.(varId, value);
+    syncAndSaveSettings(settings, context);
+}
+
 export function configureSettingsFactory(options = {}) {
     applyThemeSettingFn = options.applyThemeSetting || (() => {});
     applyRawCustomCssFn = options.applyRawCustomCss || (() => {});
@@ -457,16 +463,12 @@ function createSlider(container, setting, settings) {
 
     slider.addEventListener('input', () => {
         numberInput.value = slider.value;
-        settings[varId] = slider.value;
-        applyThemeSettingFn(varId, slider.value);
-        syncAndSaveSettings(settings, context);
+        commitSettingChange(settings, context, varId, slider.value);
     });
 
     numberInput.addEventListener('change', () => {
         slider.value = numberInput.value;
-        settings[varId] = numberInput.value;
-        applyThemeSettingFn(varId, numberInput.value);
-        syncAndSaveSettings(settings, context);
+        commitSettingChange(settings, context, varId, numberInput.value);
     });
 
     sliderContainer.appendChild(slider);
@@ -491,9 +493,7 @@ function createSelect(container, setting, settings) {
     });
 
     select.addEventListener('change', () => {
-        settings[varId] = select.value;
-        applyThemeSettingFn(varId, select.value);
-        syncAndSaveSettings(settings, context);
+        commitSettingChange(settings, context, varId, select.value);
     });
 
     container.appendChild(select);
@@ -510,9 +510,7 @@ function createTextInput(container, setting, settings) {
     input.classList.add('text_pole', 'wide100p', 'widthNatural', 'flex1', 'margin0', 'moonlit-input');
 
     input.addEventListener('change', () => {
-        settings[varId] = input.value;
-        applyThemeSettingFn(varId, input.value);
-        syncAndSaveSettings(settings, context);
+        commitSettingChange(settings, context, varId, input.value);
     });
 
     container.appendChild(input);
@@ -529,12 +527,11 @@ function createTextareaInput(container, setting, settings) {
     textarea.spellcheck = false;
     textarea.value = (settings[varId] ?? defaultValue) || '';
 
+    const applyChange = varId === 'rawCustomCss'
+        ? (_varId, value) => applyRawCustomCssFn(value)
+        : null;
     const apply = () => {
-        settings[varId] = textarea.value;
-        if (varId === 'rawCustomCss') {
-            applyRawCustomCssFn(settings[varId]);
-        }
-        syncAndSaveSettings(settings, context);
+        commitSettingChange(settings, context, varId, textarea.value, applyChange);
     };
 
     textarea.addEventListener('change', apply);
@@ -620,10 +617,10 @@ function createCheckbox(container, setting, settings) {
     void applyCss(checkbox.checked);
 
     checkbox.addEventListener('change', () => {
-        settings[varId] = checkbox.checked;
-        void applyCss(checkbox.checked);
-        applyThemeSettingFn(varId, checkbox.checked ? 'true' : 'false');
-        syncAndSaveSettings(settings, context);
+        commitSettingChange(settings, context, varId, checkbox.checked, (changedVarId, enabled) => {
+            void applyCss(enabled);
+            applyThemeSettingFn(changedVarId, enabled ? 'true' : 'false');
+        });
     });
 
     checkboxRow.appendChild(label);
