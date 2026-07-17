@@ -2471,8 +2471,9 @@ body.big-avatars #right-nav-panel #rm_print_characters_block
 body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
 > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar) {
     display: grid !important;
+    flex: 0 0 auto !important;
     grid-template-columns: var(--moonlit-character-avatar-size, 56px) minmax(0, 1fr) !important;
-    grid-template-rows: minmax(min-content, auto) !important;
+    grid-template-rows: minmax(var(--moonlit-character-avatar-size, 56px), auto) !important;
     align-items: center !important;
 }
 
@@ -2554,8 +2555,7 @@ body:not(.charListGrid) #right-nav-panel #rm_print_characters_block:not(.bulk_se
 body:not(.charListGrid) #right-nav-panel #rm_print_characters_block.bulk_select
 > :is(.group_select, .bogus_folder_select):not(.inline_avatar)
 > :is(.avatar, .missing-avatar, .bogus_folder_back_placeholder) {
-    grid-column: 1 !important;
-    grid-row: 1 / -1 !important;
+    grid-area: 1 / 1 / 2 / 2 !important;
     place-self: center !important;
     margin: 0 !important;
 }
@@ -2563,8 +2563,7 @@ body:not(.charListGrid) #right-nav-panel #rm_print_characters_block.bulk_select
 body:not(.charListGrid) #right-nav-panel #rm_print_characters_block.bulk_select
 > .character_select:not(.inline_avatar)
 > :is(.avatar, .missing-avatar) {
-    grid-column: 2 !important;
-    grid-row: 1 / -1 !important;
+    grid-area: 1 / 2 / 2 / 3 !important;
     place-self: center !important;
     margin: 0 !important;
 }
@@ -2586,8 +2585,7 @@ body.charListGrid #right-nav-panel #rm_print_characters_block
 body:not(.charListGrid) #right-nav-panel #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
 > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
 > :is(.character_select_container, .group_select_container) {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
+    grid-area: 1 / 2 / 2 / 3 !important;
     align-self: stretch !important;
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) !important;
