@@ -2471,7 +2471,7 @@ body.big-avatars #right-nav-panel #rm_print_characters_block
 body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_select):not(.bulk_select)
 > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar) {
     display: grid !important;
-    grid-template-columns: var(--moonlit-character-avatar-size) minmax(0, 1fr) !important;
+    grid-template-columns: var(--moonlit-character-avatar-size, 56px) minmax(0, 1fr) !important;
     grid-template-rows: minmax(min-content, auto) !important;
     align-items: center !important;
 }
@@ -2490,29 +2490,29 @@ body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_selec
     }
 }
 
-/* SillyBunny's big-avatar mode uses a portrait ratio globally. Character drawer
-   rows always use a centered square crop, independent of that page-wide mode. */
-:root body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block
+/* Keep drawer avatars square even when iOS/WebKit renders the panel without
+   .openDrawer or resolves an image from its intrinsic aspect ratio. */
+:root body:not(.charListGrid) #right-nav-panel #rm_print_characters_block
 > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
 > :is(.avatar, .missing-avatar, .bogus_folder_back_placeholder),
-:root body.charListGrid #right-nav-panel.openDrawer #rm_print_characters_block
+:root body.charListGrid #right-nav-panel #rm_print_characters_block
 > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
 > :is(.avatar, .missing-avatar, .bogus_folder_back_placeholder) {
     display: grid !important;
     place-items: center !important;
-    inline-size: var(--moonlit-character-avatar-size) !important;
-    width: var(--moonlit-character-avatar-size) !important;
-    block-size: var(--moonlit-character-avatar-size) !important;
-    height: var(--moonlit-character-avatar-size) !important;
-    min-inline-size: var(--moonlit-character-avatar-size) !important;
-    min-width: var(--moonlit-character-avatar-size) !important;
-    max-inline-size: var(--moonlit-character-avatar-size) !important;
-    max-width: var(--moonlit-character-avatar-size) !important;
-    min-block-size: var(--moonlit-character-avatar-size) !important;
-    min-height: var(--moonlit-character-avatar-size) !important;
-    max-block-size: var(--moonlit-character-avatar-size) !important;
-    max-height: var(--moonlit-character-avatar-size) !important;
-    flex: 0 0 var(--moonlit-character-avatar-size) !important;
+    inline-size: var(--moonlit-character-avatar-size, 56px) !important;
+    width: var(--moonlit-character-avatar-size, 56px) !important;
+    block-size: var(--moonlit-character-avatar-size, 56px) !important;
+    height: var(--moonlit-character-avatar-size, 56px) !important;
+    min-inline-size: var(--moonlit-character-avatar-size, 56px) !important;
+    min-width: var(--moonlit-character-avatar-size, 56px) !important;
+    max-inline-size: var(--moonlit-character-avatar-size, 56px) !important;
+    max-width: var(--moonlit-character-avatar-size, 56px) !important;
+    min-block-size: var(--moonlit-character-avatar-size, 56px) !important;
+    min-height: var(--moonlit-character-avatar-size, 56px) !important;
+    max-block-size: var(--moonlit-character-avatar-size, 56px) !important;
+    max-height: var(--moonlit-character-avatar-size, 56px) !important;
+    flex: 0 0 var(--moonlit-character-avatar-size, 56px) !important;
     aspect-ratio: 1 / 1 !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
@@ -2520,25 +2520,25 @@ body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_selec
     transform: none !important;
 }
 
-:root body:not(.charListGrid) #right-nav-panel.openDrawer #rm_print_characters_block
+:root body:not(.charListGrid) #right-nav-panel #rm_print_characters_block
 > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
 > .avatar:not(.avatar_collage) > img,
-:root body.charListGrid #right-nav-panel.openDrawer #rm_print_characters_block
+:root body.charListGrid #right-nav-panel #rm_print_characters_block
 > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
 > .avatar:not(.avatar_collage) > img {
     display: block !important;
-    inline-size: var(--moonlit-character-avatar-size) !important;
-    width: var(--moonlit-character-avatar-size) !important;
-    block-size: var(--moonlit-character-avatar-size) !important;
-    height: var(--moonlit-character-avatar-size) !important;
-    min-inline-size: var(--moonlit-character-avatar-size) !important;
-    min-width: var(--moonlit-character-avatar-size) !important;
-    max-inline-size: var(--moonlit-character-avatar-size) !important;
-    max-width: var(--moonlit-character-avatar-size) !important;
-    min-block-size: var(--moonlit-character-avatar-size) !important;
-    min-height: var(--moonlit-character-avatar-size) !important;
-    max-block-size: var(--moonlit-character-avatar-size) !important;
-    max-height: var(--moonlit-character-avatar-size) !important;
+    inline-size: var(--moonlit-character-avatar-size, 56px) !important;
+    width: var(--moonlit-character-avatar-size, 56px) !important;
+    block-size: var(--moonlit-character-avatar-size, 56px) !important;
+    height: var(--moonlit-character-avatar-size, 56px) !important;
+    min-inline-size: var(--moonlit-character-avatar-size, 56px) !important;
+    min-width: var(--moonlit-character-avatar-size, 56px) !important;
+    max-inline-size: var(--moonlit-character-avatar-size, 56px) !important;
+    max-width: var(--moonlit-character-avatar-size, 56px) !important;
+    min-block-size: var(--moonlit-character-avatar-size, 56px) !important;
+    min-height: var(--moonlit-character-avatar-size, 56px) !important;
+    max-block-size: var(--moonlit-character-avatar-size, 56px) !important;
+    max-height: var(--moonlit-character-avatar-size, 56px) !important;
     aspect-ratio: 1 / 1 !important;
     box-sizing: border-box !important;
     margin: 0 !important;
