@@ -2527,18 +2527,18 @@ body:not(.charListGrid) #rm_print_characters_block:not(.group_overlay_mode_selec
 > :is(.character_select, .group_select, .bogus_folder_select):not(.inline_avatar)
 > .avatar:not(.avatar_collage) > img {
     display: block !important;
-    inline-size: 100% !important;
-    width: 100% !important;
-    block-size: 100% !important;
-    height: 100% !important;
-    min-inline-size: 100% !important;
-    min-width: 100% !important;
-    max-inline-size: 100% !important;
-    max-width: 100% !important;
-    min-block-size: 100% !important;
-    min-height: 100% !important;
-    max-block-size: 100% !important;
-    max-height: 100% !important;
+    inline-size: var(--moonlit-character-avatar-size) !important;
+    width: var(--moonlit-character-avatar-size) !important;
+    block-size: var(--moonlit-character-avatar-size) !important;
+    height: var(--moonlit-character-avatar-size) !important;
+    min-inline-size: var(--moonlit-character-avatar-size) !important;
+    min-width: var(--moonlit-character-avatar-size) !important;
+    max-inline-size: var(--moonlit-character-avatar-size) !important;
+    max-width: var(--moonlit-character-avatar-size) !important;
+    min-block-size: var(--moonlit-character-avatar-size) !important;
+    min-height: var(--moonlit-character-avatar-size) !important;
+    max-block-size: var(--moonlit-character-avatar-size) !important;
+    max-height: var(--moonlit-character-avatar-size) !important;
     aspect-ratio: 1 / 1 !important;
     box-sizing: border-box !important;
     margin: 0 !important;
