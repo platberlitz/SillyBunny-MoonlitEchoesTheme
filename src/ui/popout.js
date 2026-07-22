@@ -75,18 +75,6 @@ export function openPopout() {
 
     const setupVersion = ++transitionVersion;
     popoutState = 'opening';
-    const isCollapsed = !$drawerContentElement.hasClass('open');
-
-    if (isCollapsed) {
-        try {
-            $drawerHeader.trigger('click');
-        } catch (error) {
-            if (popoutState === 'opening' && transitionVersion === setupVersion) {
-                popoutState = 'closed';
-            }
-            throw error;
-        }
-    }
 
     if (
         popoutState !== 'opening' ||
@@ -122,6 +110,8 @@ export function openPopout() {
     `);
     const contentParent = $drawerContentElement[0].parentNode;
     const contentAnchor = document.createComment('moonlit-echoes-drawer-content');
+    const contentStyle = $drawerContentElement.attr('style');
+    const contentHadOpenClass = $drawerContentElement.hasClass('open');
     $drawerContentElement[0].before(contentAnchor);
 
     $movingDivs.append($popout);
@@ -131,10 +121,11 @@ export function openPopout() {
     $drawerContentElement.addClass('open').show();
     const session = {
         $popout,
-        $drawer,
         $drawerContent: $drawerContentElement,
         contentParent,
         contentAnchor,
+        contentStyle,
+        contentHadOpenClass,
     };
     popoutSession = session;
 
@@ -274,13 +265,11 @@ function restoreDrawerContent(session) {
         session.contentParent.append(contentElement);
     }
 
-    session.$drawerContent.addClass('open').show();
-
-    if (session.$drawer) {
-        const $header = session.$drawer.find('.inline-drawer-header');
-        const $icon = session.$drawer.find('.inline-drawer-icon');
-        $header.addClass('open');
-        $icon.removeClass('down').addClass('up');
+    session.$drawerContent.toggleClass('open', session.contentHadOpenClass);
+    if (session.contentStyle === undefined) {
+        session.$drawerContent.removeAttr('style');
+    } else {
+        session.$drawerContent.attr('style', session.contentStyle);
     }
 }
 
