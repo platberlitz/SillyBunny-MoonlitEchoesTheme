@@ -632,6 +632,7 @@ function renderExtensionSettings() {
     const inlineDrawer = document.createElement('div');
     inlineDrawer.id = `${settingsKey}-drawer`;
     inlineDrawer.classList.add('inline-drawer');
+    inlineDrawer.dataset.sbDrawerPersistence = 'off';
     settingsContainer.append(inlineDrawer);
 
     // Create drawer title
@@ -649,6 +650,7 @@ function renderExtensionSettings() {
     // Create settings content area
     const inlineDrawerContent = document.createElement('div');
     inlineDrawerContent.classList.add('inline-drawer-content');
+    inlineDrawerContent.style.display = 'none';
 
     // Add to drawer
     inlineDrawer.append(inlineDrawerToggle, inlineDrawerContent);
