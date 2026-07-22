@@ -275,6 +275,13 @@ function restoreDrawerContent(session) {
     }
 
     session.$drawerContent.addClass('open').show();
+
+    if (session.$drawer) {
+        const $header = session.$drawer.find('.inline-drawer-header');
+        const $icon = session.$drawer.find('.inline-drawer-icon');
+        $header.addClass('open');
+        $icon.removeClass('down').addClass('up');
+    }
 }
 
 function setVisibility(visible) {

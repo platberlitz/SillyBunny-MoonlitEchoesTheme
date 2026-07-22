@@ -533,23 +533,28 @@ export function handleMoonlitPresetImport(jsonData) {
 
 export function syncMoonlitPresetsWithThemeList() {
     const { settings } = getContextAndSettings();
-    if (!settings) return;
+    if (!settings || !settings.presets) return;
 
     const themeSelector = document.getElementById('themes');
     if (!themeSelector) return;
 
     if (settings.enabled) {
         const activePreset = settings.activePreset;
-        let optionExists = false;
-        for (let i = 0; i < themeSelector.options.length; i++) {
-            if (themeSelector.options[i].value === activePreset) {
-                optionExists = true;
-                break;
-            }
-        }
+        const currentThemeValue = themeSelector.value;
+        const isCurrentThemeMoonlitPreset = Object.prototype.hasOwnProperty.call(settings.presets, currentThemeValue);
 
-        if (optionExists && themeSelector.value !== activePreset) {
-            themeSelector.value = activePreset;
+        if (isCurrentThemeMoonlitPreset) {
+            let optionExists = false;
+            for (let i = 0; i < themeSelector.options.length; i++) {
+                if (themeSelector.options[i].value === activePreset) {
+                    optionExists = true;
+                    break;
+                }
+            }
+
+            if (optionExists && themeSelector.value !== activePreset) {
+                themeSelector.value = activePreset;
+            }
         }
     }
 }
